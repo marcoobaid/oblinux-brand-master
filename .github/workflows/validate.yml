@@ -6,9 +6,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
-      - run: make assets
       - run: make validate
       - run: make check-generated
       - run: git diff --exit-code

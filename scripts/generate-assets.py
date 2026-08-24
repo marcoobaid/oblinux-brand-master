@@ -169,6 +169,12 @@ def digest_tree(root: Path) -> dict[str, str]:
             for p in sorted(root.rglob("*")) if p.is_file() and not ignored.intersection(p.parts)}
 
 
+def digest_sources(root: Path) -> dict[str, str]:
+    """Hash renderer-independent generated files, excluding raster encodings."""
+    return {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
+            for p in sorted(root.rglob("*")) if p.is_file() and p.suffix.lower() != ".png"}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--check", action="store_true")
@@ -182,13 +188,19 @@ def main() -> int:
         return 0
     if args.check:
         with tempfile.TemporaryDirectory() as directory:
-            staged = Path(directory) / "repo"
-            shutil.copytree(ROOT, staged, ignore=shutil.ignore_patterns(".git", "__pycache__"))
+            staged = Path(directory) / "first"
+            repeated = Path(directory) / "second"
+            ignored = shutil.ignore_patterns(".git", "__pycache__")
+            shutil.copytree(ROOT, staged, ignore=ignored)
+            shutil.copytree(ROOT, repeated, ignore=ignored)
             generate(staged, not args.source_only)
-            generate(ROOT, not args.source_only)
+            generate(repeated, not args.source_only)
             for relative in ("brand/master", "assets", "themes"):
-                if digest_tree(staged / relative) != digest_tree(ROOT / relative):
-                    print(f"generated files differ in {relative}", file=sys.stderr)
+                if digest_tree(staged / relative) != digest_tree(repeated / relative):
+                    print(f"repeated generation differs in {relative}", file=sys.stderr)
+                    return 1
+                if digest_sources(staged / relative) != digest_sources(ROOT / relative):
+                    print(f"committed generated sources differ in {relative}", file=sys.stderr)
                     return 1
         return 0
     generate(ROOT, not args.source_only)
