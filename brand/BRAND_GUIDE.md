@@ -39,6 +39,9 @@ and Arch as `inter-font`. Use 650–700 for headlines, 500–600 for labels, and
 for body/UI text. Fallback: **DejaVu Sans**, then platform `sans-serif`. Font
 binaries are not redistributed here.
 
+The production wordmark is custom locked artwork traced from R5 and is always an
+outline. Inter is for general communication only; it does not render the logo.
+
 ## Backgrounds and voice
 
 Use white/very light gray for editorial contexts and derived navy/near-black for

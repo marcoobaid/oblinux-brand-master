@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
+import re
 import shutil
 import subprocess
 import sys
@@ -25,28 +27,73 @@ def copy(source: Path, target: Path) -> None:
     shutil.copyfile(source, target)
 
 
+def master_variants(root: Path) -> None:
+    """Compose outlined lockups and color variants from the two locked masters."""
+    master = root / "brand/master"
+    symbol_svg = (master / "oblinux-symbol.svg").read_text(encoding="utf-8")
+    wordmark_svg = (master / "oblinux-wordmark.svg").read_text(encoding="utf-8")
+    symbol = re.search(r'<g id="symbol".*?</g>', symbol_svg, re.S).group(0)
+    wordmark = re.search(r'<path id="wordmark".*?/>', wordmark_svg, re.S).group(0)
+    write(master / "oblinux-symbol-micro.svg", symbol_svg.replace("OBLinux R5 symbol", "OBLinux R5 micro symbol"))
+    for name, color in (("white", "#FFFFFF"), ("black", "#0B1118"), ("blue", "#1E4D8C")):
+        mono = re.sub(r'fill="#[0-9A-Fa-f]{6}"', f'fill="{color}"', symbol)
+        write(master / f"oblinux-symbol-{name}.svg", f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="OBLinux {name} symbol">{mono}</svg>')
+
+    def lockup(name: str, color: str | None = None, stacked: bool = False) -> None:
+        mark = symbol
+        word = wordmark
+        if color:
+            mark = re.sub(r'fill="#[0-9A-Fa-f]{6}"', f'fill="{color}"', mark)
+            word = re.sub(r'fill="#[0-9A-Fa-f]{6}"', f'fill="{color}"', word)
+        if stacked:
+            body = f'<g transform="translate(74 20) scale(.88)">{mark}</g><g transform="translate(26 548) scale(.72)">{word}</g>'
+            viewbox = "0 0 600 720"
+        else:
+            body = f'<g transform="translate(20 20) scale(.547)">{mark}</g><g transform="translate(330 80) scale(.96)">{word}</g>'
+            viewbox = "0 0 1100 320"
+        write(master / name, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{viewbox}" role="img" aria-label="OBLinux outlined lockup">{body}</svg>')
+
+    lockup("oblinux-lockup.svg")
+    lockup("oblinux-lockup-stacked.svg", stacked=True)
+    lockup("oblinux-lockup-white.svg", "#FFFFFF")
+    lockup("oblinux-lockup-black.svg", "#0B1118")
+    lockup("oblinux-lockup-blue.svg", "#1E4D8C")
+
+
 def wallpaper(light: bool, variant: str = "default") -> str:
     bg = "#F4F6F8" if light else "#0B1118"
     blue = "#1E4D8C"
     navy = "#0D2742"
     orange = "#FF8A00"
-    if variant == "flow":
-        bg, blue, navy = navy, "#2865AE", "#091C30"
+    paths = {
+        "default": "M-300 1880C560 1100 1270 2310 2220 1510S3500 420 4200 880",
+        "flow": "M-260 1640C610 980 1190 2100 2170 1430S3410 570 4190 760",
+        "air": "M-180 1980C720 1230 1410 2240 2330 1460S3510 470 4160 980",
+        "orbit": "M-360 1520C500 720 1560 2140 2500 1240S3580 360 4210 650",
+        "horizon": "M-220 1750C710 1270 1360 2130 2260 1510S3380 690 4160 900",
+    }
+    curve = paths[variant]
+    if variant in {"flow", "orbit"}: bg, blue, navy = navy, "#2865AE", "#091C30"
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
-  <rect width="3840" height="2160" fill="{bg}"/>
-  <path d="M-240 1880C650 1120 1220 2360 2220 1510S3500 420 4200 880" fill="none" stroke="{blue}" stroke-opacity=".16" stroke-width="320"/>
-  <path d="M-80 2110C820 1300 1390 2500 2380 1630S3540 700 4110 980" fill="none" stroke="{orange}" stroke-opacity=".72" stroke-width="24"/>
-  <path d="M2650 -220C3180 430 3320 820 4050 1050" fill="none" stroke="{navy}" stroke-opacity=".34" stroke-width="480"/>
-  <circle cx="3480" cy="300" r="12" fill="{orange}"/><circle cx="3520" cy="300" r="12" fill="{blue}"/>
+  <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="{bg}"/><stop offset="1" stop-color="{navy}" stop-opacity=".96"/></linearGradient><linearGradient id="accent"><stop stop-color="{orange}"/><stop offset="1" stop-color="{blue}"/></linearGradient></defs>
+  <rect width="3840" height="2160" fill="url(#bg)"/>
+  <path d="{curve}" fill="none" stroke="{blue}" stroke-opacity=".16" stroke-width="340"/>
+  <path d="{curve}" fill="none" stroke="url(#accent)" stroke-opacity=".78" stroke-width="22" transform="translate(0 155)"/>
+  <path d="M2700 -330C3090 250 3360 810 4170 1060" fill="none" stroke="{blue}" stroke-opacity=".1" stroke-width="520"/>
+  <path d="M3030 -240C3320 160 3540 520 4050 690" fill="none" stroke="{orange}" stroke-opacity=".08" stroke-width="70"/>
+  <circle cx="3480" cy="300" r="11" fill="{orange}"/><circle cx="3518" cy="300" r="11" fill="{blue}"/>
 </svg>'''
 
 
-def slide() -> str:
-    return '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+def slide(title: str, message: str, number: int) -> str:
+    title, message = html.escape(title), html.escape(message)
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
   <rect width="800" height="450" fill="#F4F6F8"/><path d="M0 390C210 230 390 480 800 160V450H0Z" fill="#1E4D8C" opacity=".1"/>
-  <text x="70" y="175" font-family="Inter,DejaVu Sans,sans-serif" font-size="46" font-weight="650" fill="#163F75">Welcome to OBLinux</text>
-  <text x="72" y="228" font-family="Inter,DejaVu Sans,sans-serif" font-size="22" fill="#18212B">Freedom to choose. Power to create.</text>
+  <circle cx="720" cy="74" r="34" fill="none" stroke="#1E4D8C" stroke-width="7"/><path d="M706 55c18 12 18 26 0 38M718 51h14c18 0 24 20 4 24 21 4 14 25-5 25" fill="none" stroke="#FF8A00" stroke-width="7" stroke-linecap="round"/>
+  <text x="70" y="175" font-family="Inter,DejaVu Sans,sans-serif" font-size="44" font-weight="650" fill="#163F75">{title}</text>
+  <text x="72" y="228" font-family="Inter,DejaVu Sans,sans-serif" font-size="21" fill="#18212B">{message}</text>
   <rect x="72" y="265" width="88" height="5" rx="2.5" fill="#FF8A00"/>
+  <text x="72" y="414" font-family="Inter,DejaVu Sans,sans-serif" font-size="14" fill="#687584">{number:02d} / 07</text>
 </svg>'''
 
 
@@ -74,6 +121,7 @@ def generate(root: Path, with_png: bool = True) -> None:
     master = root / "brand/master"
     assets = root / "assets"
     themes = root / "themes"
+    master_variants(root)
     copy(master / "oblinux-symbol.svg", assets / "icons/hicolor/scalable/apps/oblinux-logo.svg")
     copy(master / "oblinux-symbol.svg", assets / "icons/hicolor/scalable/apps/oblinux-installer.svg")
     copy(master / "oblinux-symbol.svg", assets / "icons/hicolor/scalable/places/start-here-oblinux.svg")
@@ -84,13 +132,23 @@ def generate(root: Path, with_png: bool = True) -> None:
     copy(master / "oblinux-lockup-white.svg", assets / "iso/oblinux-media-lockup.svg")
     write(assets / "wallpapers/oblinux-default-light.svg", wallpaper(True))
     write(assets / "wallpapers/oblinux-default-dark.svg", wallpaper(False))
-    write(assets / "wallpapers/oblinux-flow.svg", wallpaper(False, "flow"))
-    write(assets / "wallpapers/oblinux-air.svg", wallpaper(True, "flow"))
+    for name, light in (("flow", False), ("air", True), ("orbit", False), ("horizon", True)):
+        write(assets / f"wallpapers/oblinux-{name}.svg", wallpaper(light, name))
     for name, source in (("logo.svg", "oblinux-lockup.svg"), ("icon.svg", "oblinux-symbol.svg"),
                          ("welcome.svg", "oblinux-lockup-stacked.svg"), ("logo-white.svg", "oblinux-lockup-white.svg"),
                          ("icon-white.svg", "oblinux-symbol-white.svg")):
         copy(master / source, themes / "calamares/oblinux" / name)
-    write(themes / "calamares/oblinux/slideshow/01-welcome.svg", slide())
+    slides = (
+        ("Welcome to OBLinux", "Freedom to choose. Power to create."),
+        ("Freedom & Choice", "Your system, your workflow, your decision."),
+        ("Open & Transparent", "Built on open source and open standards."),
+        ("Secure & Reliable", "A stable foundation with privacy in mind."),
+        ("Creative & Productive", "Tools for making, learning, and getting work done."),
+        ("Built for Everyone", "Approachable for newcomers. Capable for experts."),
+        ("Ready to Begin", "Complete setup, restart, and make OBLinux yours."),
+    )
+    for number, (title, message) in enumerate(slides, 1):
+        write(themes / f"calamares/oblinux/slideshow/{number:02d}-{title.lower().split()[0].replace('&', 'and')}.svg", slide(title, message, number))
     if not with_png:
         return
     for size in SIZES:
@@ -128,9 +186,10 @@ def main() -> int:
             shutil.copytree(ROOT, staged, ignore=shutil.ignore_patterns(".git", "__pycache__"))
             generate(staged, not args.source_only)
             generate(ROOT, not args.source_only)
-            if digest_tree(staged / "assets") != digest_tree(ROOT / "assets"):
-                print("generated assets differ", file=sys.stderr)
-                return 1
+            for relative in ("brand/master", "assets", "themes"):
+                if digest_tree(staged / relative) != digest_tree(ROOT / relative):
+                    print(f"generated files differ in {relative}", file=sys.stderr)
+                    return 1
         return 0
     generate(ROOT, not args.source_only)
     return 0

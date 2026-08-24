@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3840 2160">
   <defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#F4F6F8"/><stop offset="1" stop-color="#0D2742" stop-opacity=".96"/></linearGradient><linearGradient id="accent"><stop stop-color="#FF8A00"/><stop offset="1" stop-color="#1E4D8C"/></linearGradient></defs>
   <rect width="3840" height="2160" fill="url(#bg)"/>
-  <path d="M-180 1980C720 1230 1410 2240 2330 1460S3510 470 4160 980" fill="none" stroke="#1E4D8C" stroke-opacity=".16" stroke-width="340"/>
-  <path d="M-180 1980C720 1230 1410 2240 2330 1460S3510 470 4160 980" fill="none" stroke="url(#accent)" stroke-opacity=".78" stroke-width="22" transform="translate(0 155)"/>
+  <path d="M-220 1750C710 1270 1360 2130 2260 1510S3380 690 4160 900" fill="none" stroke="#1E4D8C" stroke-opacity=".16" stroke-width="340"/>
+  <path d="M-220 1750C710 1270 1360 2130 2260 1510S3380 690 4160 900" fill="none" stroke="url(#accent)" stroke-opacity=".78" stroke-width="22" transform="translate(0 155)"/>
   <path d="M2700 -330C3090 250 3360 810 4170 1060" fill="none" stroke="#1E4D8C" stroke-opacity=".1" stroke-width="520"/>
   <path d="M3030 -240C3320 160 3540 520 4050 690" fill="none" stroke="#FF8A00" stroke-opacity=".08" stroke-width="70"/>
   <circle cx="3480" cy="300" r="11" fill="#FF8A00"/><circle cx="3518" cy="300" r="11" fill="#1E4D8C"/>

@@ -18,6 +18,7 @@ images:
   productLogoWhite: logo-white.svg
   productIconWhite: icon-white.svg
 slideshow: slideshow.qml
+finished: finished.qml
 style:
   sidebarBackground: "#0D2742"
   sidebarText: "#FFFFFF"

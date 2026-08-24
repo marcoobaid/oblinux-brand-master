@@ -4,6 +4,8 @@
 from __future__ import annotations
 
 import json
+import hashlib
+import glob
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -31,15 +33,27 @@ required = [
     "themes/plymouth/oblinux/oblinux.script", "themes/grub/oblinux/theme.txt",
     "themes/calamares/oblinux/branding.desc", "themes/calamares/oblinux/slideshow.qml",
     "packaging/debian/control", "packaging/arch/PKGBUILD", "docs/INTEGRATION.md",
+    "brand/reference/oblinux-r5-visual-identity-guide.jpg",
+    "themes/calamares/oblinux/finished.qml",
 ]
 for item in required:
     require(item)
+
+reference = require("brand/reference/oblinux-r5-visual-identity-guide.jpg")
+if hashlib.sha256(reference.read_bytes()).hexdigest() != "72159cc6085729092fdc27d40b82ad28753042a7a51b122112244bc42aee4443":
+    ERRORS.append("authoritative R5 reference changed unexpectedly")
 
 for svg in ROOT.rglob("*.svg"):
     try:
         ET.parse(svg)
     except ET.ParseError as exc:
         ERRORS.append(f"invalid SVG {svg.relative_to(ROOT)}: {exc}")
+
+for name in ("oblinux-wordmark.svg", "oblinux-lockup.svg", "oblinux-lockup-stacked.svg",
+             "oblinux-lockup-white.svg", "oblinux-lockup-black.svg", "oblinux-lockup-blue.svg"):
+    tree = ET.parse(require(f"brand/master/{name}"))
+    if any(element.tag.rsplit("}", 1)[-1] == "text" for element in tree.iter()):
+        ERRORS.append(f"live text in production master: {name}")
 
 tokens = json.loads(require("brand/tokens/colors.json").read_text(encoding="utf-8"))
 if tokens["brand"]["blue"]["$value"] != "#1E4D8C": ERRORS.append("primary blue changed")
@@ -61,11 +75,41 @@ grub = require("themes/grub/oblinux/theme.txt").read_text()
 if 'desktop-image: "background.png"' not in grub: ERRORS.append("GRUB background reference missing")
 
 for size in (16, 24, 32, 48, 64, 96, 128, 256, 512, 1024):
-    png = ROOT / f"assets/icons/hicolor/{size}x{size}/apps/oblinux-logo.png"
-    if png.exists():
+    for app in ("oblinux-logo", "oblinux-installer"):
+        png = require(f"assets/icons/hicolor/{size}x{size}/apps/{app}.png")
+        if not png.exists(): continue
         data = png.read_bytes()
         if data[:8] != b"\x89PNG\r\n\x1a\n" or int.from_bytes(data[16:20], "big") != size or int.from_bytes(data[20:24], "big") != size:
             ERRORS.append(f"wrong icon dimensions: {png.relative_to(ROOT)}")
+
+calamares = require("themes/calamares/oblinux/slideshow.qml").read_text()
+for slide in ("01-welcome.svg", "02-freedom.svg", "03-open.svg", "04-secure.svg",
+              "05-creative.svg", "06-built.svg", "07-ready.svg"):
+    require(f"themes/calamares/oblinux/slideshow/{slide}")
+    if slide not in calamares: ERRORS.append(f"Calamares missing reference: {slide}")
+for name in ("logo.svg", "icon.svg", "welcome.svg", "logo-white.svg", "icon-white.svg"):
+    require(f"themes/calamares/oblinux/{name}")
+
+for name in ("symbol.png", "dot.png", "oblinux.script"):
+    require(f"themes/plymouth/oblinux/{name}")
+for name in ("background.png", "theme.txt"):
+    require(f"themes/grub/oblinux/{name}")
+
+debian = require("packaging/debian/control").read_text()
+if "python3" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
+arch = require("packaging/arch/PKGBUILD").read_text()
+if "'python'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build dependencies incomplete")
+install = require("packaging/debian/oblinux-branding.install").read_text()
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
+    if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
+for line in install.splitlines():
+    if line.strip() and not glob.glob(str(ROOT / line.split()[0])):
+        ERRORS.append(f"Debian payload pattern matches nothing: {line.split()[0]}")
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
+    if payload not in arch: ERRORS.append(f"Arch payload omitted: {payload}")
+
+for link in ROOT.rglob("*"):
+    if link.is_symlink() and not link.exists(): ERRORS.append(f"broken symlink: {link.relative_to(ROOT)}")
 
 if ERRORS:
     print("Validation failed:")
