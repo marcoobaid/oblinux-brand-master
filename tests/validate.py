@@ -40,6 +40,7 @@ required = [
     "packaging/debian/control", "packaging/arch/PKGBUILD", "docs/INTEGRATION.md",
     "brand/reference/oblinux-r5-visual-identity-guide.jpg",
     "themes/calamares/oblinux/finished.qml",
+    "assets/vendor/oblinux-about.svg",
 ]
 for item in required:
     require(item)
@@ -136,11 +137,33 @@ for svg in ROOT.rglob("*.svg"):
     if 'preserveAspectRatio="none"' in svg.read_text(encoding="utf-8"):
         ERRORS.append(f"aspect-ratio disabling SVG: {svg.relative_to(ROOT)}")
 
+about_path = require("assets/vendor/oblinux-about.svg")
+about_tree = ET.parse(about_path)
+about_root = about_tree.getroot()
+if about_root.attrib.get("viewBox") != "0 0 1536 1536":
+    ERRORS.append("GNOME About asset does not use the one-third padded canvas")
+about_paths = [element.attrib.get("d") for element in about_tree.iter()
+               if element.tag.rsplit("}", 1)[-1] == "path"]
+if about_paths != canonical_paths:
+    ERRORS.append("GNOME About asset does not preserve canonical R5 geometry")
+about_groups = [element for element in about_tree.iter()
+                if element.tag.rsplit("}", 1)[-1] == "g"]
+if not any(group.attrib.get("transform") == "translate(512 512)" for group in about_groups):
+    ERRORS.append("GNOME About asset symbol is not centered at one-third scale")
+
 for name in ("symbol.png", "dot.png", "dot-white.png", "oblinux.script"):
     require(f"themes/plymouth/oblinux/{name}")
 plymouth_script = require("themes/plymouth/oblinux/oblinux.script").read_text()
 if 'Image("dot-white.png")' not in plymouth_script: ERRORS.append("Plymouth idle dots missing")
 if "% 5" not in plymouth_script: ERRORS.append("Plymouth five-dot animation missing")
+if "Time()" in plymouth_script: ERRORS.append("Plymouth uses unsupported Time() animation")
+if plymouth_script.count("Sprite(dot.image)") != 1: ERRORS.append("Plymouth must use one active-dot sprite")
+for position in ("dot.x0", "dot.x1", "dot.x2", "dot.x3", "dot.x4"):
+    if position not in plymouth_script: ERRORS.append(f"Plymouth fixed position missing: {position}")
+if "dot.tick % 10 == 0" not in plymouth_script:
+    ERRORS.append("Plymouth refresh-counter cadence missing")
+if "dot.sprite.SetPosition(dot.positions[0], dot.y, 10)" not in plymouth_script:
+    ERRORS.append("Plymouth static orange fallback missing")
 for name in ("background.png", "logo.png", "theme.txt"):
     require(f"themes/grub/oblinux/{name}")
 grub_logo = require("themes/grub/oblinux/logo.png").read_bytes()
@@ -151,6 +174,22 @@ if (grub_logo[:8] != b"\x89PNG\r\n\x1a\n" or
 if "width = 420" not in grub or "height = 123" not in grub:
     ERRORS.append("GRUB lockup component does not preserve raster dimensions")
 
+for name, size in (("symbol.png", 384), ("dot.png", 24), ("dot-white.png", 24)):
+    data = require(f"themes/plymouth/oblinux/{name}").read_bytes()
+    if (data[:8] != b"\x89PNG\r\n\x1a\n" or
+            int.from_bytes(data[16:20], "big") != size or
+            int.from_bytes(data[20:24], "big") != size):
+        ERRORS.append(f"Plymouth raster dimensions are not {size}x{size}: {name}")
+
+for width, height in ((1366, 768), (1920, 1080), (2560, 1440)):
+    symbol_left, symbol_top = width / 2 - 192, height / 2 - 246
+    row_left, row_right = width / 2 - 136, width / 2 + 136
+    row_top, row_bottom = height / 2 + 166, height / 2 + 190
+    if min(symbol_left, symbol_top, row_left, row_top) < 0:
+        ERRORS.append(f"Plymouth composition clips at {width}x{height}")
+    if symbol_left + 384 > width or symbol_top + 384 > height or row_right > width or row_bottom > height:
+        ERRORS.append(f"Plymouth composition clips at {width}x{height}")
+
 debian = require("packaging/debian/control").read_text()
 if "python3" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
 arch = require("packaging/arch/PKGBUILD").read_text()
@@ -158,17 +197,17 @@ if "'python'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build 
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.1" not in arch: ERRORS.append("Arch package version is not 1.0.1")
+if "pkgver=1.0.2" not in arch: ERRORS.append("Arch package version is not 1.0.2")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.1-1)"):
-    ERRORS.append("Debian package version is not 1.0.1-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.2-1)"):
+    ERRORS.append("Debian package version is not 1.0.2-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
-for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
 for line in install.splitlines():
     if line.strip() and not glob.glob(str(ROOT / line.split()[0])):
         ERRORS.append(f"Debian payload pattern matches nothing: {line.split()[0]}")
-for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
     if payload not in arch: ERRORS.append(f"Arch payload omitted: {payload}")
 
 for link in ROOT.rglob("*"):

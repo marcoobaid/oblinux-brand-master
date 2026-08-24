@@ -10,17 +10,37 @@ under `/usr/share/gnome-background-properties`, dconf defaults under
 Run `dconf update` and `gtk-update-icon-cache` in the image build. System/About
 uses the `LOGO=oblinux-logo` os-release value.
 
+GNOME Control Center on Debian also consumes the scalable vendor emblem at
+`/usr/share/icons/vendor/scalable/emblems/emblem-vendor.svg`. Register
+`/usr/share/oblinux/vendor/oblinux-about.svg` for that scalable alternative.
+This dedicated asset centers the exact R5 geometry on a three-times-wide and
+three-times-high canvas, reducing the visible symbol to one-third without
+changing the master or any hicolor application icon. Do not use this padded
+asset for launchers, application icons, Calamares, or Plymouth.
+
 GDM intentionally uses the default upstream shell. The maintainable branding is
 the dark default background and system identity; no GNOME Shell CSS is patched.
 
 ## Plymouth
 
 Install `themes/plymouth/oblinux` at `/usr/share/plymouth/themes/oblinux` and the
-generated PNGs beside the script. Debian: select with
-`plymouth-set-default-theme -R oblinux`. Arch: set `Theme=oblinux` in
-`/etc/plymouth/plymouthd.conf` and rebuild the initramfs.
+generated PNGs beside the script. Debian 13 image assembly registers and selects
+the descriptor with:
+
+```sh
+update-alternatives --install /usr/share/plymouth/themes/default.plymouth \
+  default.plymouth /usr/share/plymouth/themes/oblinux/oblinux.plymouth 200
+```
+
+It then rebuilds the target image's initramfs. Arch: set `Theme=oblinux` in
+`/etc/plymouth/plymouthd.conf` and rebuild the target image's initramfs.
+Brand Master supplies the complete theme payload but deliberately does not
+select a host theme or rebuild a host initramfs during package installation.
 The theme keeps the centered R5 symbol and animates a quiet five-dot
 white/orange progress row beneath it.
+The v1.0.2 script uses one orange sprite moving across five fixed subdued-dot
+positions from a refresh counter. Its initialized first position is the static
+fallback if refresh callbacks are unavailable.
 
 ## GRUB
 

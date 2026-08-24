@@ -4,6 +4,20 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-24
+
+### Fixed
+
+- Added a dedicated, reproducibly padded GNOME About/vendor symbol without
+  changing the authoritative master or hicolor application icons.
+- Doubled the Plymouth symbol and dot dimensions and replaced the unsupported
+  timing expression with a refresh-counter animation across five fixed dots.
+
+### Validation
+
+- Added canonical-geometry, canvas-ratio, package-payload, raster-dimension,
+  animation-state, and representative-resolution composition checks.
+
 ## [1.0.1] - 2026-08-24
 
 ### Fixed

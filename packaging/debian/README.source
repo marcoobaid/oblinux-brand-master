@@ -4,5 +4,5 @@ For a source package, expose `packaging/debian` as the top-level `debian`
 directory (for example from a release tarball prepared by CI), then run
 `dpkg-buildpackage -us -uc`. Since this is a non-native `3.0 (quilt)` package,
 place the matching pristine release source at
-`../oblinux-branding_1.0.1.orig.tar.gz` when building a source package.
+`../oblinux-branding_1.0.2.orig.tar.gz` when building a source package.
 `librsvg2-bin` provides deterministic SVG rendering.

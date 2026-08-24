@@ -97,6 +97,13 @@ def slide(title: str, message: str, number: int, symbol: str) -> str:
 </svg>'''
 
 
+def about_vendor(symbol: str) -> str:
+    """Place the locked symbol at one-third scale on a dedicated square canvas."""
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1536" role="img" aria-label="OBLinux About symbol">
+  <g transform="translate(512 512)">{symbol}</g>
+</svg>'''
+
+
 def render(svg: Path, png: Path, size: int | None = None, width: int | None = None) -> None:
     converter = shutil.which("rsvg-convert")
     png.parent.mkdir(parents=True, exist_ok=True)
@@ -140,6 +147,7 @@ def generate(root: Path, with_png: bool = True) -> None:
         write(assets / f"wallpapers/oblinux-{name}.svg", wallpaper(light, name))
     symbol_svg = (master / "oblinux-symbol.svg").read_text(encoding="utf-8")
     symbol = re.search(r'<g id="symbol".*?</g>', symbol_svg, re.S).group(0)
+    write(assets / "vendor/oblinux-about.svg", about_vendor(symbol))
     for name, source in (("logo.svg", "oblinux-lockup.svg"), ("icon.svg", "oblinux-symbol.svg"),
                          ("welcome.svg", "oblinux-lockup.svg"), ("logo-white.svg", "oblinux-lockup-white.svg"),
                          ("icon-white.svg", "oblinux-symbol-white.svg")):
@@ -156,17 +164,17 @@ def generate(root: Path, with_png: bool = True) -> None:
     for number, (title, message) in enumerate(slides, 1):
         write(themes / f"calamares/oblinux/slideshow/{number:02d}-{title.lower().split()[0].replace('&', 'and')}.svg", slide(title, message, number, symbol))
     # Progress-dot SVG sources are retained beside their raster derivatives.
-    write(themes / "plymouth/oblinux/dot.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="5" fill="#FF8A00"/></svg>')
-    write(themes / "plymouth/oblinux/dot-white.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="5" fill="#FFFFFF" fill-opacity=".52"/></svg>')
+    write(themes / "plymouth/oblinux/dot.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><circle cx="12" cy="12" r="10" fill="#FF8A00"/></svg>')
+    write(themes / "plymouth/oblinux/dot-white.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><circle cx="12" cy="12" r="10" fill="#FFFFFF" fill-opacity=".52"/></svg>')
     if not with_png:
         return
     for size in SIZES:
         source = master / ("oblinux-symbol-micro.svg" if size < 32 else "oblinux-symbol.svg")
         render(source, assets / f"icons/hicolor/{size}x{size}/apps/oblinux-logo.png", size)
         render(source, assets / f"icons/hicolor/{size}x{size}/apps/oblinux-installer.png", size)
-    render(master / "oblinux-symbol.svg", themes / "plymouth/oblinux/symbol.png", 192)
-    render(themes / "plymouth/oblinux/dot.svg", themes / "plymouth/oblinux/dot.png", 12)
-    render(themes / "plymouth/oblinux/dot-white.svg", themes / "plymouth/oblinux/dot-white.png", 12)
+    render(master / "oblinux-symbol.svg", themes / "plymouth/oblinux/symbol.png", 384)
+    render(themes / "plymouth/oblinux/dot.svg", themes / "plymouth/oblinux/dot.png", 24)
+    render(themes / "plymouth/oblinux/dot-white.svg", themes / "plymouth/oblinux/dot-white.png", 24)
     render(assets / "wallpapers/oblinux-default-dark.svg", themes / "grub/oblinux/background.png")
     render(master / "oblinux-lockup-white.svg", themes / "grub/oblinux/logo.png", width=420)
     render(master / "oblinux-symbol-micro.svg", assets / "web/favicon-32.png", 32)
@@ -190,7 +198,8 @@ def main() -> int:
     parser.add_argument("--clean", action="store_true")
     parser.add_argument("--source-only", action="store_true")
     args = parser.parse_args()
-    generated = [ROOT / "assets/wallpapers", ROOT / "assets/web", ROOT / "assets/iso", ROOT / "assets/icons/hicolor"]
+    generated = [ROOT / "assets/wallpapers", ROOT / "assets/web", ROOT / "assets/iso",
+                 ROOT / "assets/icons/hicolor", ROOT / "assets/vendor"]
     if args.clean:
         for path in generated:
             shutil.rmtree(path, ignore_errors=True)

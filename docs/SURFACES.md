@@ -4,6 +4,7 @@
 |---|---|---|
 | GNOME | paired wallpapers, XML, dconf, hicolor icon | upstream compatible |
 | GDM | system identity and dark background guidance | no Shell CSS fork |
+| GNOME About | dedicated padded vendor emblem | one-third visible symbol; hicolor unchanged |
 | Plymouth | complete script theme and generated PNGs | centered R5 symbol, subtle five-dot progress |
 | GRUB | theme descriptor/background/lockup | visible OBLinux identity, readable orange selection |
 | Calamares | descriptor, QML, symbol, welcome/slides | accessible sidebar, proportional R5 artwork |

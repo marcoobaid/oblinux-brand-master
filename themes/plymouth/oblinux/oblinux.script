@@ -3,7 +3,7 @@ Window.SetBackgroundBottomColor(0.051, 0.153, 0.259);
 logo.image = Image("symbol.png");
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 30);
+logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2 - 54);
 dot.image = Image("dot.png");
 dot.sprite = Sprite(dot.image);
 dot.idle_image = Image("dot-white.png");
@@ -12,15 +12,30 @@ dot.idle1 = Sprite(dot.idle_image);
 dot.idle2 = Sprite(dot.idle_image);
 dot.idle3 = Sprite(dot.idle_image);
 dot.idle4 = Sprite(dot.idle_image);
-dot.y = Window.GetHeight() / 2 + 105;
-dot.idle0.SetPosition(Window.GetWidth() / 2 - 62, dot.y, 5);
-dot.idle1.SetPosition(Window.GetWidth() / 2 - 31, dot.y, 5);
-dot.idle2.SetPosition(Window.GetWidth() / 2, dot.y, 5);
-dot.idle3.SetPosition(Window.GetWidth() / 2 + 31, dot.y, 5);
-dot.idle4.SetPosition(Window.GetWidth() / 2 + 62, dot.y, 5);
+dot.y = logo.sprite.GetY() + logo.image.GetHeight() + 28;
+dot.x0 = Window.GetWidth() / 2 - 136;
+dot.x1 = Window.GetWidth() / 2 - 74;
+dot.x2 = Window.GetWidth() / 2 - 12;
+dot.x3 = Window.GetWidth() / 2 + 50;
+dot.x4 = Window.GetWidth() / 2 + 112;
+dot.idle0.SetPosition(dot.x0, dot.y, 5);
+dot.idle1.SetPosition(dot.x1, dot.y, 5);
+dot.idle2.SetPosition(dot.x2, dot.y, 5);
+dot.idle3.SetPosition(dot.x3, dot.y, 5);
+dot.idle4.SetPosition(dot.x4, dot.y, 5);
+dot.positions[0] = dot.x0;
+dot.positions[1] = dot.x1;
+dot.positions[2] = dot.x2;
+dot.positions[3] = dot.x3;
+dot.positions[4] = dot.x4;
+dot.frame = 0;
+dot.tick = 0;
+dot.sprite.SetPosition(dot.positions[0], dot.y, 10);
 fun refresh_callback () {
-  dot.sprite.SetX(Window.GetWidth() / 2 - 62 + (Math.Int(Time() * 2.5) % 5) * 31);
-  dot.sprite.SetY(dot.y);
-  dot.sprite.SetZ(10);
+  dot.tick++;
+  if (dot.tick % 10 == 0) {
+    dot.frame = (dot.frame + 1) % 5;
+    dot.sprite.SetPosition(dot.positions[dot.frame], dot.y, 10);
+  }
 }
 Plymouth.SetRefreshFunction(refresh_callback);

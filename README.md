@@ -14,7 +14,7 @@ make assets          # requires rsvg-convert (librsvg2-bin)
 make check-generated # verifies reproducibility
 ```
 
-The current release candidate is **1.0.1**. See [the brand guide](brand/BRAND_GUIDE.md),
+The current release candidate is **1.0.2**. See [the brand guide](brand/BRAND_GUIDE.md),
 [integration documentation](docs/INTEGRATION.md), and [release process](docs/RELEASING.md).
 
 ## Source of truth

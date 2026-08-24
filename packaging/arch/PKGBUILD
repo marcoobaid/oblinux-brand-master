@@ -1,5 +1,5 @@
 pkgname=oblinux-branding
-pkgver=1.0.1
+pkgver=1.0.2
 pkgrel=1
 _source_commit=946c63057291bb5a50a82a19d40d4f11bbe7fe3e
 pkgdesc='Shared OBLinux R5 visual identity assets'
@@ -32,6 +32,8 @@ package() {
   install -m644 assets/gnome/oblinux-backgrounds.xml "$pkgdir/usr/share/gnome-background-properties/"
   install -m644 assets/gnome/00-oblinux-backgrounds "$pkgdir/etc/dconf/db/local.d/"
   cp -a assets/icons/hicolor/. "$pkgdir/usr/share/icons/hicolor/"
+  install -dm755 "$pkgdir/usr/share/oblinux/vendor"
+  cp -a assets/vendor/. "$pkgdir/usr/share/oblinux/vendor/"
   install -dm755 "$pkgdir/usr/share/plymouth/themes" "$pkgdir/usr/share/grub/themes" "$pkgdir/usr/share/calamares/branding"
   cp -a themes/plymouth/oblinux "$pkgdir/usr/share/plymouth/themes/"
   cp -a themes/grub/oblinux "$pkgdir/usr/share/grub/themes/"

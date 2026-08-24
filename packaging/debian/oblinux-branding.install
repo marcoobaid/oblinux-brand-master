@@ -5,6 +5,7 @@ assets/icons/hicolor/* usr/share/icons/hicolor/
 assets/system/* usr/share/oblinux/templates/
 assets/web/* usr/share/oblinux/web/
 assets/iso/* usr/share/oblinux/iso/
+assets/vendor/* usr/share/oblinux/vendor/
 themes/plymouth/oblinux/* usr/share/plymouth/themes/oblinux/
 themes/grub/oblinux/* usr/share/grub/themes/oblinux/
 themes/calamares/oblinux/* usr/share/calamares/branding/oblinux/
