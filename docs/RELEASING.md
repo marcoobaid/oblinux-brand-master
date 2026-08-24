@@ -5,8 +5,10 @@
    Linux build environment.
 3. Inspect the complete diff and scan for credentials and absolute paths.
 4. Commit, push normally, and wait for CI.
-5. Create an annotated semantic tag such as `v1.0.0` only after validation.
-6. Downstreams pin that tag or its immutable archive checksum.
+5. Pin the Arch source to the immutable release-payload commit and its verified
+   GitHub archive SHA-256; validate and commit that final package metadata.
+6. Create an annotated semantic tag such as `v1.0.0` only after validation.
+7. Downstreams pin that tag or its immutable archive checksum.
 
 Patch releases correct files without changing the identity; minor releases add
 compatible surfaces; a major release is required for intentional downstream

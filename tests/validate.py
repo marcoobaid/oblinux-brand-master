@@ -99,6 +99,13 @@ debian = require("packaging/debian/control").read_text()
 if "python3" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
 arch = require("packaging/arch/PKGBUILD").read_text()
 if "'python'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build dependencies incomplete")
+if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
+if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
+if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
+if "pkgver=1.0.0" not in arch: ERRORS.append("Arch package version is not 1.0.0")
+debian_changelog = require("packaging/debian/changelog").read_text()
+if not debian_changelog.startswith("oblinux-branding (1.0.0-1)"):
+    ERRORS.append("Debian package version is not 1.0.0-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
