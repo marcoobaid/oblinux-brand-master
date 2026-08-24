@@ -1,5 +1,5 @@
-oblinux-branding (0.1.0-1) unstable; urgency=medium
+oblinux-branding (1.0.0-1) unstable; urgency=medium
 
-  * Initial pre-release Brand Master packaging.
+  * Initial production Brand Master release.
 
- -- OBLinux Project <maintainers@oblinux.invalid>  Sun, 23 Aug 2026 00:00:00 -0500
+ -- Marco Obaid <marco.obaid@gmail.com>  Sun, 23 Aug 2026 00:00:00 -0500

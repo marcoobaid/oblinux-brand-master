@@ -1,7 +1,7 @@
 Source: oblinux-branding
 Section: misc
 Priority: optional
-Maintainer: OBLinux Project <maintainers@oblinux.invalid>
+Maintainer: Marco Obaid <marco.obaid@gmail.com>
 Build-Depends: debhelper-compat (= 13), python3, librsvg2-bin
 Standards-Version: 4.7.0
 Rules-Requires-Root: no

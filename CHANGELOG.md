@@ -4,6 +4,8 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-23
+
 ### Added
 
 - Initial production Brand Master structure.

@@ -3,4 +3,3 @@
 For a source package, expose `packaging/debian` as the top-level `debian`
 directory (for example from a release tarball prepared by CI), then run
 `dpkg-buildpackage -us -uc`. `librsvg2-bin` provides deterministic SVG rendering.
-Replace the placeholder maintainer address before a public stable release.

@@ -14,7 +14,7 @@ make assets          # requires rsvg-convert (librsvg2-bin)
 make check-generated # verifies reproducibility
 ```
 
-The current baseline is **0.1.0** (pre-release). See [the brand guide](brand/BRAND_GUIDE.md),
+The current release is **1.0.0**. See [the brand guide](brand/BRAND_GUIDE.md),
 [integration documentation](docs/INTEGRATION.md), and [release process](docs/RELEASING.md).
 
 ## Source of truth
@@ -25,8 +25,10 @@ The current baseline is **0.1.0** (pre-release). See [the brand guide](brand/BRA
 - Distribution integration: `packaging/debian/` and `packaging/arch/`
 - Surface themes: `themes/`
 
-The reference board supplied by the project owner is documented in
-`brand/reference/README.md`; it is not redistributed unless its provenance permits it.
+The authoritative locked R5 visual reference is preserved at
+`brand/reference/oblinux-r5-visual-identity-guide.jpg`. Its documented SHA-256
+is validated automatically and it is the reference used to verify the production
+master artwork. It is not a generated asset or a downstream package payload.
 
 ## License
 
