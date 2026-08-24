@@ -1,0 +1,38 @@
+pkgname=oblinux-branding
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Shared OBLinux R5 visual identity assets'
+arch=('any')
+url='https://github.com/marcoobaid/oblinux-brand-master'
+license=('MIT' 'custom:OBLinux-brand')
+makedepends=('librsvg')
+optdepends=('inter-font: primary OBLinux typography')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP') # release automation must replace before publication
+
+build() {
+  cd "$pkgname-$pkgver"
+  python3 scripts/generate-assets.py
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  python3 tests/validate.py
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -Dm644 TRADEMARKS.md "$pkgdir/usr/share/licenses/$pkgname/TRADEMARKS.md"
+  install -dm755 "$pkgdir/usr/share/oblinux"
+  cp -a brand "$pkgdir/usr/share/oblinux/"
+  install -dm755 "$pkgdir/usr/share/backgrounds/oblinux" "$pkgdir/usr/share/gnome-background-properties" "$pkgdir/etc/dconf/db/local.d" "$pkgdir/usr/share/icons/hicolor"
+  cp -a assets/wallpapers/. "$pkgdir/usr/share/backgrounds/oblinux/"
+  install -m644 assets/gnome/oblinux-backgrounds.xml "$pkgdir/usr/share/gnome-background-properties/"
+  install -m644 assets/gnome/00-oblinux-backgrounds "$pkgdir/etc/dconf/db/local.d/"
+  cp -a assets/icons/hicolor/. "$pkgdir/usr/share/icons/hicolor/"
+  install -dm755 "$pkgdir/usr/share/plymouth/themes" "$pkgdir/usr/share/grub/themes" "$pkgdir/usr/share/calamares/branding"
+  cp -a themes/plymouth/oblinux "$pkgdir/usr/share/plymouth/themes/"
+  cp -a themes/grub/oblinux "$pkgdir/usr/share/grub/themes/"
+  cp -a themes/calamares/oblinux "$pkgdir/usr/share/calamares/branding/"
+}

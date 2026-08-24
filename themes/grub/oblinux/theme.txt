@@ -1,0 +1,29 @@
+title-text: "OBLinux"
+title-font: "DejaVu Sans Bold 28"
+title-color: "#ffffff"
+desktop-color: "#0b1118"
+desktop-image: "background.png"
+message-color: "#ffffff"
+message-bg-color: "#0d2742"
+terminal-font: "DejaVu Sans Mono 14"
++ boot_menu {
+  left = 20%
+  top = 32%
+  width = 60%
+  height = 42%
+  item_font = "DejaVu Sans 16"
+  item_color = "#ffffff"
+  selected_item_color = "#ff8a00"
+  item_height = 36
+  item_padding = 8
+  item_spacing = 4
+}
++ label {
+  text = "Freedom to choose. Power to create."
+  left = 0
+  top = 88%
+  width = 100%
+  align = "center"
+  color = "#aeb8c4"
+  font = "DejaVu Sans 13"
+}

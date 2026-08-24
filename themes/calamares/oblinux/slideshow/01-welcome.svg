@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <rect width="800" height="450" fill="#F4F6F8"/><path d="M0 390C210 230 390 480 800 160V450H0Z" fill="#1E4D8C" opacity=".1"/>
+  <text x="70" y="175" font-family="Inter,DejaVu Sans,sans-serif" font-size="46" font-weight="650" fill="#163F75">Welcome to OBLinux</text>
+  <text x="72" y="228" font-family="Inter,DejaVu Sans,sans-serif" font-size="22" fill="#18212B">Freedom to choose. Power to create.</text>
+  <rect x="72" y="265" width="88" height="5" rx="2.5" fill="#FF8A00"/>
+</svg>

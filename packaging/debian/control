@@ -1,0 +1,16 @@
+Source: oblinux-branding
+Section: misc
+Priority: optional
+Maintainer: OBLinux Project <maintainers@oblinux.invalid>
+Build-Depends: debhelper-compat (= 13), librsvg2-bin
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/marcoobaid/oblinux-brand-master
+
+Package: oblinux-branding
+Architecture: all
+Depends: ${misc:Depends}
+Recommends: fonts-inter
+Description: shared visual identity assets for OBLinux
+ Installs the locked OBLinux R5 artwork, GNOME backgrounds, hicolor icons,
+ Plymouth theme, GRUB theme, Calamares branding, and neutral system templates.

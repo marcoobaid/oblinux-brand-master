@@ -1,0 +1,13 @@
+{
+  "$schema": "https://design-tokens.github.io/community-group/format/",
+  "brand": {
+    "blue": { "$type": "color", "$value": "#1E4D8C", "description": "Locked OBLinux Blue" },
+    "orange": { "$type": "color", "$value": "#FF8A00", "description": "Locked OBLinux Orange" },
+    "white": { "$type": "color", "$value": "#FFFFFF" },
+    "nearBlack": { "$type": "color", "$value": "#0B1118" },
+    "navy": { "$type": "color", "$value": "#0D2742", "description": "Derived dark surface" },
+    "gray100": { "$type": "color", "$value": "#F4F6F8" },
+    "gray500": { "$type": "color", "$value": "#687584" },
+    "gray900": { "$type": "color", "$value": "#18212B" }
+  }
+}

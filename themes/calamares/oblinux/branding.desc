@@ -1,0 +1,25 @@
+---
+componentName: oblinux
+strings:
+  productName: OBLinux
+  shortProductName: OBLinux
+  version: "@VERSION@"
+  shortVersion: "@VERSION@"
+  versionedName: OBLinux @VERSION@
+  shortVersionedName: OBLinux @VERSION@
+  bootloaderEntryName: OBLinux
+  productUrl: "@HOME_URL@"
+  supportUrl: "@SUPPORT_URL@"
+  knownIssuesUrl: "@BUG_REPORT_URL@"
+images:
+  productLogo: logo.svg
+  productIcon: icon.svg
+  productWelcome: welcome.svg
+  productLogoWhite: logo-white.svg
+  productIconWhite: icon-white.svg
+slideshow: slideshow.qml
+style:
+  sidebarBackground: "#0D2742"
+  sidebarText: "#FFFFFF"
+  sidebarTextSelect: "#FF8A00"
+  sidebarTextCurrent: "#FFFFFF"

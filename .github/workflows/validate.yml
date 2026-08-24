@@ -1,0 +1,14 @@
+name: Validate Brand Master
+on:
+  push:
+  pull_request:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+      - run: make assets
+      - run: make validate
+      - run: make check-generated
+      - run: git diff --exit-code

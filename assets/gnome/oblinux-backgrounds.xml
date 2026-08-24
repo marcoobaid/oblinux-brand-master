@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false"><name>OBLinux Default</name><filename>/usr/share/backgrounds/oblinux/oblinux-default-light.svg</filename><filename-dark>/usr/share/backgrounds/oblinux/oblinux-default-dark.svg</filename-dark><options>zoom</options><pcolor>#F4F6F8</pcolor><scolor>#1E4D8C</scolor><shade_type>solid</shade_type></wallpaper>
+  <wallpaper deleted="false"><name>OBLinux Flow</name><filename>/usr/share/backgrounds/oblinux/oblinux-flow.svg</filename><options>zoom</options><pcolor>#0D2742</pcolor><scolor>#1E4D8C</scolor><shade_type>solid</shade_type></wallpaper>
+</wallpapers>

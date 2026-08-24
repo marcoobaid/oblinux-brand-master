@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=OBLinux
+Description=OBLinux R5 boot theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/oblinux
+ScriptFile=/usr/share/plymouth/themes/oblinux/oblinux.script
