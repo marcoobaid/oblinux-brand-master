@@ -13,6 +13,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ERRORS: list[str] = []
+LOCKED_MASTER_SHA256 = {
+    "brand/master/oblinux-symbol.svg": "afa19488a141275e6ff4c09515c9a679807dfff4610a72f8faab7da145cf9d0f",
+    "brand/master/oblinux-wordmark.svg": "452af88be8b3c69c0d38eec33b09501264ee7fcbe9ea479d9289657d26b1f002",
+    "brand/master/oblinux-lockup.svg": "0f1369646943183fa22b15f8fa2999cf88fb48b50c8c9d6705f26110f76b9ee9",
+}
 
 
 def require(relative: str) -> Path:
@@ -38,6 +43,10 @@ required = [
 ]
 for item in required:
     require(item)
+
+for relative, expected in LOCKED_MASTER_SHA256.items():
+    if hashlib.sha256(require(relative).read_bytes()).hexdigest() != expected:
+        ERRORS.append(f"locked R5 master changed: {relative}")
 
 reference = require("brand/reference/oblinux-r5-visual-identity-guide.jpg")
 if hashlib.sha256(reference.read_bytes()).hexdigest() != "72159cc6085729092fdc27d40b82ad28753042a7a51b122112244bc42aee4443":
@@ -73,6 +82,7 @@ for reference in ("oblinux.script",):
     if reference not in plymouth: ERRORS.append(f"Plymouth missing reference: {reference}")
 grub = require("themes/grub/oblinux/theme.txt").read_text()
 if 'desktop-image: "background.png"' not in grub: ERRORS.append("GRUB background reference missing")
+if 'file = "logo.png"' not in grub: ERRORS.append("GRUB OBLinux lockup reference missing")
 
 for size in (16, 24, 32, 48, 64, 96, 128, 256, 512, 1024):
     for app in ("oblinux-logo", "oblinux-installer"):
@@ -83,17 +93,63 @@ for size in (16, 24, 32, 48, 64, 96, 128, 256, 512, 1024):
             ERRORS.append(f"wrong icon dimensions: {png.relative_to(ROOT)}")
 
 calamares = require("themes/calamares/oblinux/slideshow.qml").read_text()
+descriptor = require("themes/calamares/oblinux/branding.desc").read_text()
+if "productName: OBLinux\n" not in descriptor: ERRORS.append("Calamares product name is not OBLinux")
+if "OBLinux Debian" in descriptor: ERRORS.append("Calamares exposes downstream distribution in product name")
+if "productLogo: icon.svg" not in descriptor: ERRORS.append("Calamares sidebar logo is not the square R5 symbol")
+if "welcomeExpandingLogo: false" not in descriptor: ERRORS.append("Calamares welcome logo may be stretched")
+for key, value in (("SidebarBackground", "#0D2742"), ("SidebarText", "#FFFFFF"),
+                   ("SidebarTextCurrent", "#FF8A00"), ("SidebarBackgroundCurrent", "#0D2742")):
+    if f'{key}: "{value}"' not in descriptor: ERRORS.append(f"Calamares style missing: {key}")
+if re.search(r"(?m)^\s+sidebar(?:Background|Text)", descriptor):
+    ERRORS.append("Calamares contains unsupported lowercase sidebar style keys")
+
+def luminance(color: str) -> float:
+    channels = [int(color[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+    linear = [value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4
+              for value in channels]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+def contrast(first: str, second: str) -> float:
+    bright, dark = sorted((luminance(first), luminance(second)), reverse=True)
+    return (bright + 0.05) / (dark + 0.05)
+
+if contrast("#0D2742", "#FFFFFF") < 4.5: ERRORS.append("Calamares sidebar text contrast is insufficient")
+if contrast("#0D2742", "#FF8A00") < 4.5: ERRORS.append("Calamares active text contrast is insufficient")
+
+canonical_symbol = ET.parse(require("brand/master/oblinux-symbol.svg"))
+canonical_paths = [element.attrib.get("d") for element in canonical_symbol.iter()
+                   if element.tag.rsplit("}", 1)[-1] == "path"]
 for slide in ("01-welcome.svg", "02-freedom.svg", "03-open.svg", "04-secure.svg",
               "05-creative.svg", "06-built.svg", "07-ready.svg"):
-    require(f"themes/calamares/oblinux/slideshow/{slide}")
+    slide_path = require(f"themes/calamares/oblinux/slideshow/{slide}")
     if slide not in calamares: ERRORS.append(f"Calamares missing reference: {slide}")
+    slide_tree = ET.parse(slide_path)
+    slide_paths = [element.attrib.get("d") for element in slide_tree.iter()
+                   if element.tag.rsplit("}", 1)[-1] == "path"]
+    if not all(path in slide_paths for path in canonical_paths):
+        ERRORS.append(f"Calamares slide lacks approved R5 symbol geometry: {slide}")
 for name in ("logo.svg", "icon.svg", "welcome.svg", "logo-white.svg", "icon-white.svg"):
     require(f"themes/calamares/oblinux/{name}")
 
-for name in ("symbol.png", "dot.png", "oblinux.script"):
+for svg in ROOT.rglob("*.svg"):
+    if 'preserveAspectRatio="none"' in svg.read_text(encoding="utf-8"):
+        ERRORS.append(f"aspect-ratio disabling SVG: {svg.relative_to(ROOT)}")
+
+for name in ("symbol.png", "dot.png", "dot-white.png", "oblinux.script"):
     require(f"themes/plymouth/oblinux/{name}")
-for name in ("background.png", "theme.txt"):
+plymouth_script = require("themes/plymouth/oblinux/oblinux.script").read_text()
+if 'Image("dot-white.png")' not in plymouth_script: ERRORS.append("Plymouth idle dots missing")
+if "% 5" not in plymouth_script: ERRORS.append("Plymouth five-dot animation missing")
+for name in ("background.png", "logo.png", "theme.txt"):
     require(f"themes/grub/oblinux/{name}")
+grub_logo = require("themes/grub/oblinux/logo.png").read_bytes()
+if (grub_logo[:8] != b"\x89PNG\r\n\x1a\n" or
+        int.from_bytes(grub_logo[16:20], "big") != 420 or
+        int.from_bytes(grub_logo[20:24], "big") != 123):
+    ERRORS.append("GRUB lockup dimensions are not proportional 420x123")
+if "width = 420" not in grub or "height = 123" not in grub:
+    ERRORS.append("GRUB lockup component does not preserve raster dimensions")
 
 debian = require("packaging/debian/control").read_text()
 if "python3" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
@@ -102,10 +158,10 @@ if "'python'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build 
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.0" not in arch: ERRORS.append("Arch package version is not 1.0.0")
+if "pkgver=1.0.1" not in arch: ERRORS.append("Arch package version is not 1.0.1")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.0-1)"):
-    ERRORS.append("Debian package version is not 1.0.0-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.1-1)"):
+    ERRORS.append("Debian package version is not 1.0.1-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")

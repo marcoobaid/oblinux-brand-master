@@ -7,7 +7,8 @@
 4. Commit, push normally, and wait for CI.
 5. Pin the Arch source to the immutable release-payload commit and its verified
    GitHub archive SHA-256; validate and commit that final package metadata.
-6. Create an annotated semantic tag such as `v1.0.0` only after validation.
+6. Create the approved annotated semantic tag, such as `v1.0.1`, only after
+   validation and the release-readiness report.
 7. Downstreams pin that tag or its immutable archive checksum.
 
 Patch releases correct files without changing the identity; minor releases add

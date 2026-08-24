@@ -85,11 +85,11 @@ def wallpaper(light: bool, variant: str = "default") -> str:
 </svg>'''
 
 
-def slide(title: str, message: str, number: int) -> str:
+def slide(title: str, message: str, number: int, symbol: str) -> str:
     title, message = html.escape(title), html.escape(message)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
   <rect width="800" height="450" fill="#F4F6F8"/><path d="M0 390C210 230 390 480 800 160V450H0Z" fill="#1E4D8C" opacity=".1"/>
-  <circle cx="720" cy="74" r="34" fill="none" stroke="#1E4D8C" stroke-width="7"/><path d="M706 55c18 12 18 26 0 38M718 51h14c18 0 24 20 4 24 21 4 14 25-5 25" fill="none" stroke="#FF8A00" stroke-width="7" stroke-linecap="round"/>
+  <g transform="translate(684 34) scale(.105)">{symbol}</g>
   <text x="70" y="175" font-family="Inter,DejaVu Sans,sans-serif" font-size="44" font-weight="650" fill="#163F75">{title}</text>
   <text x="72" y="228" font-family="Inter,DejaVu Sans,sans-serif" font-size="21" fill="#18212B">{message}</text>
   <rect x="72" y="265" width="88" height="5" rx="2.5" fill="#FF8A00"/>
@@ -97,13 +97,15 @@ def slide(title: str, message: str, number: int) -> str:
 </svg>'''
 
 
-def render(svg: Path, png: Path, size: int | None = None) -> None:
+def render(svg: Path, png: Path, size: int | None = None, width: int | None = None) -> None:
     converter = shutil.which("rsvg-convert")
     png.parent.mkdir(parents=True, exist_ok=True)
     if converter:
         command = [converter, "--keep-aspect-ratio"]
         if size:
             command += ["--width", str(size), "--height", str(size)]
+        elif width:
+            command += ["--width", str(width)]
         command += ["--output", str(png), str(svg)]
         subprocess.run(command, check=True)
         return
@@ -114,6 +116,8 @@ def render(svg: Path, png: Path, size: int | None = None) -> None:
     options = {"url": str(svg), "write_to": str(png)}
     if size:
         options.update(output_width=size, output_height=size)
+    elif width:
+        options.update(output_width=width)
     cairosvg.svg2png(**options)
 
 
@@ -134,8 +138,10 @@ def generate(root: Path, with_png: bool = True) -> None:
     write(assets / "wallpapers/oblinux-default-dark.svg", wallpaper(False))
     for name, light in (("flow", False), ("air", True), ("orbit", False), ("horizon", True)):
         write(assets / f"wallpapers/oblinux-{name}.svg", wallpaper(light, name))
+    symbol_svg = (master / "oblinux-symbol.svg").read_text(encoding="utf-8")
+    symbol = re.search(r'<g id="symbol".*?</g>', symbol_svg, re.S).group(0)
     for name, source in (("logo.svg", "oblinux-lockup.svg"), ("icon.svg", "oblinux-symbol.svg"),
-                         ("welcome.svg", "oblinux-lockup-stacked.svg"), ("logo-white.svg", "oblinux-lockup-white.svg"),
+                         ("welcome.svg", "oblinux-lockup.svg"), ("logo-white.svg", "oblinux-lockup-white.svg"),
                          ("icon-white.svg", "oblinux-symbol-white.svg")):
         copy(master / source, themes / "calamares/oblinux" / name)
     slides = (
@@ -148,7 +154,10 @@ def generate(root: Path, with_png: bool = True) -> None:
         ("Ready to Begin", "Complete setup, restart, and make OBLinux yours."),
     )
     for number, (title, message) in enumerate(slides, 1):
-        write(themes / f"calamares/oblinux/slideshow/{number:02d}-{title.lower().split()[0].replace('&', 'and')}.svg", slide(title, message, number))
+        write(themes / f"calamares/oblinux/slideshow/{number:02d}-{title.lower().split()[0].replace('&', 'and')}.svg", slide(title, message, number, symbol))
+    # Progress-dot SVG sources are retained beside their raster derivatives.
+    write(themes / "plymouth/oblinux/dot.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="5" fill="#FF8A00"/></svg>')
+    write(themes / "plymouth/oblinux/dot-white.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="5" fill="#FFFFFF" fill-opacity=".52"/></svg>')
     if not with_png:
         return
     for size in SIZES:
@@ -156,10 +165,10 @@ def generate(root: Path, with_png: bool = True) -> None:
         render(source, assets / f"icons/hicolor/{size}x{size}/apps/oblinux-logo.png", size)
         render(source, assets / f"icons/hicolor/{size}x{size}/apps/oblinux-installer.png", size)
     render(master / "oblinux-symbol.svg", themes / "plymouth/oblinux/symbol.png", 192)
-    # The progress dot is an SVG source retained beside its raster derivative.
-    write(themes / "plymouth/oblinux/dot.svg", '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12"><circle cx="6" cy="6" r="5" fill="#FF8A00"/></svg>')
     render(themes / "plymouth/oblinux/dot.svg", themes / "plymouth/oblinux/dot.png", 12)
+    render(themes / "plymouth/oblinux/dot-white.svg", themes / "plymouth/oblinux/dot-white.png", 12)
     render(assets / "wallpapers/oblinux-default-dark.svg", themes / "grub/oblinux/background.png")
+    render(master / "oblinux-lockup-white.svg", themes / "grub/oblinux/logo.png", width=420)
     render(master / "oblinux-symbol-micro.svg", assets / "web/favicon-32.png", 32)
 
 

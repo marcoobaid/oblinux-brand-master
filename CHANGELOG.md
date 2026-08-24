@@ -4,6 +4,24 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-08-24
+
+### Fixed
+
+- Added a proportional approved R5 lockup to the shared GRUB theme.
+- Added a restrained five-dot white/orange Plymouth progress animation while
+  preserving the centered R5 symbol and dark background.
+- Corrected Calamares sidebar schema keys, accessible navy/white/orange
+  contrast, square sidebar symbol usage, proportional welcome artwork, and
+  consistent approved R5 symbols across all seven slides.
+- Corrected Debian source-package format for versioned non-native releases.
+
+### Validation
+
+- Locked the approved symbol, wordmark, and primary lockup hashes.
+- Added checks for GRUB/Plymouth resources, Calamares naming, sidebar contrast,
+  proportional artwork, and canonical slide-symbol geometry.
+
 ## [1.0.0] - 2026-08-23
 
 ### Added

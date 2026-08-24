@@ -1,5 +1,10 @@
 ---
 componentName: oblinux
+welcomeStyleCalamares: false
+welcomeExpandingLogo: false
+windowExpanding: normal
+windowSize: 900px,600px
+windowPlacement: center
 strings:
   productName: OBLinux
   shortProductName: OBLinux
@@ -12,15 +17,15 @@ strings:
   supportUrl: "@SUPPORT_URL@"
   knownIssuesUrl: "@BUG_REPORT_URL@"
 images:
-  productLogo: logo.svg
+  productLogo: icon.svg
   productIcon: icon.svg
   productWelcome: welcome.svg
-  productLogoWhite: logo-white.svg
+  productLogoWhite: icon-white.svg
   productIconWhite: icon-white.svg
 slideshow: slideshow.qml
 finished: finished.qml
 style:
-  sidebarBackground: "#0D2742"
-  sidebarText: "#FFFFFF"
-  sidebarTextSelect: "#FF8A00"
-  sidebarTextCurrent: "#FFFFFF"
+  SidebarBackground: "#0D2742"
+  SidebarText: "#FFFFFF"
+  SidebarTextCurrent: "#FF8A00"
+  SidebarBackgroundCurrent: "#0D2742"

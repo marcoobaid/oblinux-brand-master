@@ -19,6 +19,8 @@ Install `themes/plymouth/oblinux` at `/usr/share/plymouth/themes/oblinux` and th
 generated PNGs beside the script. Debian: select with
 `plymouth-set-default-theme -R oblinux`. Arch: set `Theme=oblinux` in
 `/etc/plymouth/plymouthd.conf` and rebuild the initramfs.
+The theme keeps the centered R5 symbol and animates a quiet five-dot
+white/orange progress row beneath it.
 
 ## GRUB
 
@@ -26,12 +28,17 @@ Install the theme under `/usr/share/grub/themes/oblinux`. Debian sets
 `GRUB_THEME=/usr/share/grub/themes/oblinux/theme.txt` in `/etc/default/grub.d/`;
 Arch sets the same in `/etc/default/grub`. Regenerate the GRUB configuration.
 The theme avoids platform-specific menu entry names.
+The included `logo.png` is a proportional raster of the approved R5 lockup and
+must be installed beside `theme.txt` and `background.png`.
 
 ## Calamares
 
 Replace descriptor `@…@` fields during image assembly and install the directory
 under `/usr/share/calamares/branding/oblinux`. Set `branding: oblinux` in
 `settings.conf`. Distribution-specific release metadata belongs downstream.
+The shared product name remains `OBLinux`; do not append a downstream base
+distribution to the primary installer name. The widget sidebar requires the
+capitalized Calamares style keys shipped in the descriptor.
 
 ## Live ISO and console
 

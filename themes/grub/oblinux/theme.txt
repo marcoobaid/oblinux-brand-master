@@ -1,14 +1,19 @@
-title-text: "OBLinux"
-title-font: "DejaVu Sans Bold 28"
-title-color: "#ffffff"
+title-text: ""
 desktop-color: "#0b1118"
 desktop-image: "background.png"
 message-color: "#ffffff"
 message-bg-color: "#0d2742"
 terminal-font: "DejaVu Sans Mono 14"
++ image {
+  file = "logo.png"
+  left = 50%-210
+  top = 7%
+  width = 420
+  height = 123
+}
 + boot_menu {
   left = 20%
-  top = 32%
+  top = 30%
   width = 60%
   height = 42%
   item_font = "DejaVu Sans 16"
@@ -21,7 +26,7 @@ terminal-font: "DejaVu Sans Mono 14"
 + label {
   text = "Freedom to choose. Power to create."
   left = 0
-  top = 88%
+  top = 90%
   width = 100%
   align = "center"
   color = "#aeb8c4"
