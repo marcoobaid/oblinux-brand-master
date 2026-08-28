@@ -4,6 +4,22 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-08-28
+
+### Added
+
+- Added a compact, two-color FastFetch text logo derived reproducibly from the
+  locked R5 symbol and a distribution-neutral system configuration.
+- Added Debian and Arch package payloads for the stable shared FastFetch files
+  under `/usr/share/oblinux/terminal/fastfetch/`.
+- Documented the shared visual/downstream activation boundary for Debian and
+  Arch.
+
+### Validation
+
+- Added FastFetch asset, JSONC structure, color, legacy-mark exclusion,
+  generation, and Debian/Arch package-payload checks.
+
 ## [1.0.2] - 2026-08-24
 
 ### Fixed

@@ -1,12 +1,12 @@
 pkgname=oblinux-branding
-pkgver=1.0.2
+pkgver=1.0.3
 pkgrel=1
 _source_commit=8a39eeb4a9b6f86b671cf40bab68a05521686952
 pkgdesc='Shared OBLinux R5 visual identity assets'
 arch=('any')
 url='https://github.com/marcoobaid/oblinux-brand-master'
 license=('MIT' 'custom:OBLinux-brand')
-makedepends=('python' 'librsvg')
+makedepends=('python' 'python-pillow' 'librsvg')
 optdepends=('inter-font: primary OBLinux typography')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/$_source_commit.tar.gz")
 sha256sums=('719887b3d5c4a3f813c3a6e67c6ef4c19522eeb9cf92ddfd62f6706e529ba582')
@@ -34,6 +34,9 @@ package() {
   cp -a assets/icons/hicolor/. "$pkgdir/usr/share/icons/hicolor/"
   install -dm755 "$pkgdir/usr/share/oblinux/vendor"
   cp -a assets/vendor/. "$pkgdir/usr/share/oblinux/vendor/"
+  install -Dm644 assets/terminal/fastfetch/logo.txt "$pkgdir/usr/share/oblinux/terminal/fastfetch/logo.txt"
+  install -Dm644 assets/terminal/fastfetch/config.jsonc "$pkgdir/usr/share/oblinux/terminal/fastfetch/config.jsonc"
+  install -Dm644 assets/terminal/fastfetch/README.md "$pkgdir/usr/share/doc/$pkgname/fastfetch/README.md"
   install -dm755 "$pkgdir/usr/share/plymouth/themes" "$pkgdir/usr/share/grub/themes" "$pkgdir/usr/share/calamares/branding"
   cp -a themes/plymouth/oblinux "$pkgdir/usr/share/plymouth/themes/"
   cp -a themes/grub/oblinux "$pkgdir/usr/share/grub/themes/"

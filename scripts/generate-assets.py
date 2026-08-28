@@ -128,6 +128,32 @@ def render(svg: Path, png: Path, size: int | None = None, width: int | None = No
     cairosvg.svg2png(**options)
 
 
+def terminal_logo(source: Path) -> str:
+    """Derive compact two-color block art from the locked R5 symbol raster."""
+    try:
+        from PIL import Image  # type: ignore
+    except ImportError as exc:
+        raise RuntimeError("terminal logo generation requires Python Pillow") from exc
+
+    image = Image.open(source).convert("RGBA").resize((20, 10), Image.Resampling.LANCZOS)
+    rows: list[str] = []
+    for y in range(image.height):
+        row = ""
+        active_color = ""
+        for x in range(image.width):
+            red, green, blue, alpha = image.getpixel((x, y))
+            if alpha <= 80:
+                row += "  "
+                continue
+            color = "2" if red > blue * 1.35 and green > blue else "1"
+            if color != active_color:
+                row += f"${color}"
+                active_color = color
+            row += "██"
+        rows.append(row.rstrip())
+    return "\n".join(rows)
+
+
 def generate(root: Path, with_png: bool = True) -> None:
     master = root / "brand/master"
     assets = root / "assets"
@@ -178,6 +204,8 @@ def generate(root: Path, with_png: bool = True) -> None:
     render(assets / "wallpapers/oblinux-default-dark.svg", themes / "grub/oblinux/background.png")
     render(master / "oblinux-lockup-white.svg", themes / "grub/oblinux/logo.png", width=420)
     render(master / "oblinux-symbol-micro.svg", assets / "web/favicon-32.png", 32)
+    write(assets / "terminal/fastfetch/logo.txt",
+          terminal_logo(assets / "icons/hicolor/512x512/apps/oblinux-logo.png"))
 
 
 def digest_tree(root: Path) -> dict[str, str]:
@@ -199,7 +227,8 @@ def main() -> int:
     parser.add_argument("--source-only", action="store_true")
     args = parser.parse_args()
     generated = [ROOT / "assets/wallpapers", ROOT / "assets/web", ROOT / "assets/iso",
-                 ROOT / "assets/icons/hicolor", ROOT / "assets/vendor"]
+                 ROOT / "assets/icons/hicolor", ROOT / "assets/vendor",
+                 ROOT / "assets/terminal/fastfetch/logo.txt"]
     if args.clean:
         for path in generated:
             shutil.rmtree(path, ignore_errors=True)

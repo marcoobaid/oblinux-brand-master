@@ -14,7 +14,7 @@ make assets          # requires rsvg-convert (librsvg2-bin)
 make check-generated # verifies reproducibility
 ```
 
-The current released Brand Master version is **1.0.2**. See [the brand guide](brand/BRAND_GUIDE.md),
+The repository is prepared for Brand Master version **1.0.3**. See [the brand guide](brand/BRAND_GUIDE.md),
 [integration documentation](docs/INTEGRATION.md), and [release process](docs/RELEASING.md).
 
 ## Source of truth
@@ -24,6 +24,7 @@ The current released Brand Master version is **1.0.2**. See [the brand guide](br
 - Generated deliverables: `assets/`
 - Distribution integration: `packaging/debian/` and `packaging/arch/`
 - Surface themes: `themes/`
+- Shared terminal identity: `assets/terminal/fastfetch/`
 
 The authoritative locked R5 visual reference is preserved at
 `brand/reference/oblinux-r5-visual-identity-guide.jpg`. Its documented SHA-256

@@ -10,6 +10,7 @@
 | Calamares | descriptor, QML, symbol, welcome/slides | accessible sidebar, proportional R5 artwork |
 | ISO/live | boot assets, launcher icon, media artwork | generated from master |
 | System | os-release and console templates | metadata remains downstream |
+| FastFetch | compact R5 block art and shared config | shared visual identity; modules and activation may remain downstream |
 | Web/docs | lockups, avatar, favicon sources | light/dark variants |
 
 The wallpaper collection contains Default Light, Default Dark, Air, Flow, Orbit,

@@ -1,3 +1,9 @@
+oblinux-branding (1.0.3-1) unstable; urgency=medium
+
+  * Add shared R5 FastFetch branding and reusable configuration.
+
+ -- Marco Obaid <marco.obaid@gmail.com>  Fri, 28 Aug 2026 00:00:00 -0500
+
 oblinux-branding (1.0.2-1) unstable; urgency=medium
 
   * Correct GNOME About sizing and Plymouth scale and animation.

@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+      - run: sudo apt-get update && sudo apt-get install -y librsvg2-bin python3-pil
       - run: make validate
       - run: make check-generated
       - run: git diff --exit-code

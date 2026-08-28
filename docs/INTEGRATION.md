@@ -66,6 +66,26 @@ Use the same GRUB/Plymouth assets for boot, `oblinux-logo` for the installer
 launcher, the GNOME defaults for the live session, and `assets/iso` for media
 artwork. Console templates are deliberately restrained and opt-in.
 
+## FastFetch
+
+The `oblinux-branding` package installs the shared R5 text logo and neutral
+configuration under `/usr/share/oblinux/terminal/fastfetch/`. The text logo is
+generated from the locked R5 symbol, uses FastFetch's native `$1`/`$2` color
+placeholders for canonical blue and orange, and needs no terminal image
+protocol. User
+configuration under `~/.config/fastfetch/` remains user-owned. FastFetch does
+not document `/etc/xdg/fastfetch/config.jsonc` as an automatically loaded
+system default, so downstream activation must explicitly use the packaged
+configuration or seed it without replacing an existing user configuration.
+
+Debian and Arch install FastFetch and decide how or whether to invoke it. They
+may replace the shared module list with a downstream configuration for package
+counts or other platform-specific data, but must continue to reference the
+packaged logo path rather than copying or recreating the R5 terminal artwork.
+Debian must retire its legacy `/etc/skel/.config/fastfetch/oblinux.txt`; Arch
+must consume the same package-owned logo when adding or updating FastFetch.
+Neither downstream should overwrite an existing user's configuration.
+
 ## Distribution-neutral identity
 
 Render `assets/system/os-release.in` downstream. Debian supplies `ID_LIKE=debian`;

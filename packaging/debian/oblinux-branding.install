@@ -6,6 +6,9 @@ assets/system/* usr/share/oblinux/templates/
 assets/web/* usr/share/oblinux/web/
 assets/iso/* usr/share/oblinux/iso/
 assets/vendor/* usr/share/oblinux/vendor/
+assets/terminal/fastfetch/logo.txt usr/share/oblinux/terminal/fastfetch/
+assets/terminal/fastfetch/config.jsonc usr/share/oblinux/terminal/fastfetch/
+assets/terminal/fastfetch/README.md usr/share/doc/oblinux-branding/fastfetch/
 themes/plymouth/oblinux/* usr/share/plymouth/themes/oblinux/
 themes/grub/oblinux/* usr/share/grub/themes/oblinux/
 themes/calamares/oblinux/* usr/share/calamares/branding/oblinux/

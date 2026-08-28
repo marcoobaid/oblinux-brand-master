@@ -41,6 +41,9 @@ required = [
     "brand/reference/oblinux-r5-visual-identity-guide.jpg",
     "themes/calamares/oblinux/finished.qml",
     "assets/vendor/oblinux-about.svg",
+    "assets/terminal/fastfetch/logo.txt",
+    "assets/terminal/fastfetch/config.jsonc",
+    "assets/terminal/fastfetch/README.md",
 ]
 for item in required:
     require(item)
@@ -191,24 +194,44 @@ for width, height in ((1366, 768), (1920, 1080), (2560, 1440)):
         ERRORS.append(f"Plymouth composition clips at {width}x{height}")
 
 debian = require("packaging/debian/control").read_text()
-if "python3" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
+if "python3" not in debian or "python3-pil" not in debian or "librsvg2-bin" not in debian: ERRORS.append("Debian build dependencies incomplete")
 arch = require("packaging/arch/PKGBUILD").read_text()
-if "'python'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build dependencies incomplete")
+if "'python'" not in arch or "'python-pillow'" not in arch or "'librsvg'" not in arch: ERRORS.append("Arch build dependencies incomplete")
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.2" not in arch: ERRORS.append("Arch package version is not 1.0.2")
+if "pkgver=1.0.3" not in arch: ERRORS.append("Arch package version is not 1.0.3")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.2-1)"):
-    ERRORS.append("Debian package version is not 1.0.2-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.3-1)"):
+    ERRORS.append("Debian package version is not 1.0.3-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
-for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
 for line in install.splitlines():
     if line.strip() and not glob.glob(str(ROOT / line.split()[0])):
         ERRORS.append(f"Debian payload pattern matches nothing: {line.split()[0]}")
-for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
     if payload not in arch: ERRORS.append(f"Arch payload omitted: {payload}")
+
+fastfetch_logo = require("assets/terminal/fastfetch/logo.txt").read_text(encoding="utf-8")
+fastfetch_config_text = require("assets/terminal/fastfetch/config.jsonc").read_text(encoding="utf-8")
+try:
+    fastfetch_config = json.loads(fastfetch_config_text)
+except json.JSONDecodeError as exc:
+    ERRORS.append(f"invalid FastFetch JSONC: {exc}")
+    fastfetch_config = {}
+logo_config = fastfetch_config.get("logo", {})
+if logo_config.get("type") != "file": ERRORS.append("FastFetch logo is not portable text-file mode")
+if logo_config.get("source") != "/usr/share/oblinux/terminal/fastfetch/logo.txt":
+    ERRORS.append("FastFetch config does not reference the stable package logo")
+if logo_config.get("color") != {"1": "#1E4D8C", "2": "#FF8A00"}:
+    ERRORS.append("FastFetch logo colors do not match the locked palette")
+if "$1" not in fastfetch_logo or "$2" not in fastfetch_logo:
+    ERRORS.append("FastFetch logo does not use both R5 colors")
+if "OBLinux" in fastfetch_logo or "╔" in fastfetch_logo or "╚" in fastfetch_logo:
+    ERRORS.append("legacy OB FastFetch artwork remains")
+if len(fastfetch_logo.splitlines()) > 12 or max(map(len, fastfetch_logo.splitlines())) > 60:
+    ERRORS.append("FastFetch logo is oversized")
 
 for link in ROOT.rglob("*"):
     if link.is_symlink() and not link.exists(): ERRORS.append(f"broken symlink: {link.relative_to(ROOT)}")
