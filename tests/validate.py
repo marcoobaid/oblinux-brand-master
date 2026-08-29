@@ -200,7 +200,7 @@ if "'python'" not in arch or "'python-pillow'" not in arch or "'librsvg'" not in
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.4" not in arch: ERRORS.append("Arch package version is not 1.0.4")
+if "pkgver=1.0.5" not in arch: ERRORS.append("Arch package version is not 1.0.5")
 debian_changelog = require("packaging/debian/changelog").read_text()
 if not debian_changelog.startswith("oblinux-branding (1.0.4-1)"):
     ERRORS.append("Debian package version is not 1.0.4-1")
