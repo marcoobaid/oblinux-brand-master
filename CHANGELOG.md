@@ -4,6 +4,14 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-08-29
+
+### Added
+
+- Added three distribution-neutral OBLinux GNOME desktop wallpaper variants —
+  Light, Dark, and Orange — built directly from the locked R5 lockup masters,
+  each with an SVG source and a 3840×2160 production PNG.
+
 ## [1.0.4] - 2026-08-28
 
 ### Fixed
