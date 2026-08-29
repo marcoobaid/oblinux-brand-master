@@ -54,14 +54,29 @@ Keep these categories distinct — do not blur or merge them:
 
 ## Release tags are immutable
 
+- Release tags are **always the final step** of the release process. The
+  required sequence is: **Change → Validate → Commit → Push main → CI
+  passes → Tag**.
+- Never create, move, delete, or push a release tag as part of normal
+  development work.
+- Before tagging, all intended changes must be committed; the working tree
+  must be clean; release/package metadata must be consistent; repository
+  validation must pass; changes must be pushed to `main`; and CI must pass on
+  the final `main` commit.
+- After validation and CI pass, stop and report that the repository is
+  **release-ready**. Do not create or push the release tag unless the owner
+  explicitly authorizes that tag after this declaration.
+- Never tag an intermediate release-preparation commit while further
+  validation, metadata, packaging, or corrective commits are required.
 - Once tagged (e.g. `v1.0.0`, `v1.0.1`, `v1.0.2`), a release is immutable.
 - Do not modify or move an existing release tag, rewrite published history
   under a tag, or otherwise consume/rewrite an existing release tag.
+- If a published tag has a problem, do not move or replace it automatically;
+  stop and ask the owner how to proceed.
 - **Force-push is prohibited unless explicitly authorized by the owner.**
 - Package/version changes are deliberate release work — follow
-  `docs/RELEASING.md` (changelog + version bump → validate → owner approval →
-  annotated tag). Do not bump versions or create tags casually or as a side
-  effect of unrelated work.
+  `docs/RELEASING.md`. Do not bump versions or create tags casually or as a
+  side effect of unrelated work.
 
 ## Upstream vs. downstream ownership of problems
 
