@@ -86,6 +86,14 @@ Debian must retire its legacy `/etc/skel/.config/fastfetch/oblinux.txt`; Arch
 must consume the same package-owned logo when adding or updating FastFetch.
 Neither downstream should overwrite an existing user's configuration.
 
+The v1.0.4 logo is a 30×15 quadrant-block composition sampled at an effective
+60×30 grid. It requires UTF-8 and standard Unicode Block Elements coverage,
+which normal GNOME terminal fonts provide; it does not require a Nerd Font.
+The shared config encodes blue and orange as `38;2;r;g;b` ANSI truecolor values
+so it remains compatible with Debian's tested FastFetch 2.40.4. Do not replace
+these with `#RRGGBB` strings unless the minimum downstream FastFetch version is
+raised to 2.42.0 or newer.
+
 ## Distribution-neutral identity
 
 Render `assets/system/os-release.in` downstream. Debian supplies `ID_LIKE=debian`;

@@ -4,6 +4,22 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-08-28
+
+### Fixed
+
+- Replaced the coarse 20×10 full-block FastFetch logo with a 30×15 quadrant-
+  block rendition sampled from the locked R5 symbol at an effective 60×30
+  resolution, improving curves, internal geometry, and negative spaces.
+- Encoded the canonical blue and orange as ANSI truecolor sequences supported
+  by Debian's FastFetch 2.40.4; hexadecimal color syntax requires FastFetch
+  2.42.0 or newer.
+
+### Validation
+
+- Added exact terminal dimensions, portable block-element repertoire, display
+  accent, and FastFetch 2.40-compatible truecolor checks.
+
 ## [1.0.3] - 2026-08-28
 
 ### Added

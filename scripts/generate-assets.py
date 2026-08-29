@@ -129,27 +129,51 @@ def render(svg: Path, png: Path, size: int | None = None, width: int | None = No
 
 
 def terminal_logo(source: Path) -> str:
-    """Derive compact two-color block art from the locked R5 symbol raster."""
+    """Derive 30x15 two-color quadrant art from the locked R5 symbol raster."""
     try:
         from PIL import Image  # type: ignore
     except ImportError as exc:
         raise RuntimeError("terminal logo generation requires Python Pillow") from exc
 
-    image = Image.open(source).convert("RGBA").resize((20, 10), Image.Resampling.LANCZOS)
+    columns, rows_count = 30, 15
+    image = Image.open(source).convert("RGBA")
+    bounds = image.getchannel("A").getbbox()
+    if not bounds:
+        raise RuntimeError("locked R5 symbol raster is empty")
+    image = image.crop(bounds).resize(
+        (columns * 2, rows_count * 2), Image.Resampling.LANCZOS
+    )
+    quadrants = {
+        0: " ", 1: "▘", 2: "▝", 3: "▀", 4: "▖", 5: "▌", 6: "▞", 7: "▛",
+        8: "▗", 9: "▚", 10: "▐", 11: "▜", 12: "▄", 13: "▙", 14: "▟", 15: "█",
+    }
     rows: list[str] = []
-    for y in range(image.height):
+    for cell_y in range(rows_count):
         row = ""
         active_color = ""
-        for x in range(image.width):
-            red, green, blue, alpha = image.getpixel((x, y))
-            if alpha <= 80:
-                row += "  "
+        for cell_x in range(columns):
+            mask = 0
+            blue_weight = 0
+            orange_weight = 0
+            for bit, (offset_x, offset_y) in enumerate(((0, 0), (1, 0), (0, 1), (1, 1))):
+                red, green, blue, alpha = image.getpixel(
+                    (cell_x * 2 + offset_x, cell_y * 2 + offset_y)
+                )
+                if alpha <= 80:
+                    continue
+                mask |= 1 << bit
+                if red > blue * 1.35 and green > blue:
+                    orange_weight += alpha
+                else:
+                    blue_weight += alpha
+            if not mask:
+                row += " "
                 continue
-            color = "2" if red > blue * 1.35 and green > blue else "1"
+            color = "2" if orange_weight > blue_weight else "1"
             if color != active_color:
                 row += f"${color}"
                 active_color = color
-            row += "██"
+            row += quadrants[mask]
         rows.append(row.rstrip())
     return "\n".join(rows)
 

@@ -4,16 +4,16 @@
     "type": "file",
     "source": "/usr/share/oblinux/terminal/fastfetch/logo.txt",
     "color": {
-      "1": "#1E4D8C",
-      "2": "#FF8A00"
+      "1": "38;2;30;77;140",
+      "2": "38;2;255;138;0"
     },
     "padding": { "right": 3 }
   },
   "display": {
     "separator": "  ",
     "color": {
-      "keys": "#1E4D8C",
-      "title": "#1E4D8C",
+      "keys": "38;2;30;77;140",
+      "title": "38;2;30;77;140",
       "output": "default",
       "separator": "default"
     },

@@ -14,7 +14,7 @@ make assets          # requires rsvg-convert (librsvg2-bin)
 make check-generated # verifies reproducibility
 ```
 
-The repository is prepared for Brand Master version **1.0.3**. See [the brand guide](brand/BRAND_GUIDE.md),
+The repository is prepared for Brand Master version **1.0.4**. See [the brand guide](brand/BRAND_GUIDE.md),
 [integration documentation](docs/INTEGRATION.md), and [release process](docs/RELEASING.md).
 
 ## Source of truth

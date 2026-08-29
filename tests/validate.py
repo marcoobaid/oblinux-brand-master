@@ -200,10 +200,10 @@ if "'python'" not in arch or "'python-pillow'" not in arch or "'librsvg'" not in
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.3" not in arch: ERRORS.append("Arch package version is not 1.0.3")
+if "pkgver=1.0.4" not in arch: ERRORS.append("Arch package version is not 1.0.4")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.3-1)"):
-    ERRORS.append("Debian package version is not 1.0.3-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.4-1)"):
+    ERRORS.append("Debian package version is not 1.0.4-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
@@ -224,14 +224,24 @@ logo_config = fastfetch_config.get("logo", {})
 if logo_config.get("type") != "file": ERRORS.append("FastFetch logo is not portable text-file mode")
 if logo_config.get("source") != "/usr/share/oblinux/terminal/fastfetch/logo.txt":
     ERRORS.append("FastFetch config does not reference the stable package logo")
-if logo_config.get("color") != {"1": "#1E4D8C", "2": "#FF8A00"}:
-    ERRORS.append("FastFetch logo colors do not match the locked palette")
+expected_fastfetch_colors = {"1": "38;2;30;77;140", "2": "38;2;255;138;0"}
+if logo_config.get("color") != expected_fastfetch_colors:
+    ERRORS.append("FastFetch logo colors are not compatible ANSI encodings of the locked palette")
+display_colors = fastfetch_config.get("display", {}).get("color", {})
+if display_colors.get("keys") != expected_fastfetch_colors["1"] or display_colors.get("title") != expected_fastfetch_colors["1"]:
+    ERRORS.append("FastFetch display accents do not use compatible R5 blue")
 if "$1" not in fastfetch_logo or "$2" not in fastfetch_logo:
     ERRORS.append("FastFetch logo does not use both R5 colors")
 if "OBLinux" in fastfetch_logo or "╔" in fastfetch_logo or "╚" in fastfetch_logo:
     ERRORS.append("legacy OB FastFetch artwork remains")
-if len(fastfetch_logo.splitlines()) > 12 or max(map(len, fastfetch_logo.splitlines())) > 60:
-    ERRORS.append("FastFetch logo is oversized")
+logo_lines = fastfetch_logo.splitlines()
+visible_logo_lines = [line for line in logo_lines if line.replace("$1", "").replace("$2", "").strip()]
+visible_widths = [len(line.replace("$1", "").replace("$2", "")) for line in logo_lines]
+if len(logo_lines) != 15 or len(visible_logo_lines) < 13 or max(visible_widths) > 30:
+    ERRORS.append("FastFetch logo is not the documented 30x15 composition")
+allowed_logo_characters = set(" $12▘▝▀▖▌▞▛▗▚▐▜▄▙▟█\n")
+if not set(fastfetch_logo) <= allowed_logo_characters:
+    ERRORS.append("FastFetch logo uses unsupported characters")
 
 for link in ROOT.rglob("*"):
     if link.is_symlink() and not link.exists(): ERRORS.append(f"broken symlink: {link.relative_to(ROOT)}")
