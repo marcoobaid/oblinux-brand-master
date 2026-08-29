@@ -1,7 +1,7 @@
 pkgname=oblinux-branding
-pkgver=1.0.4
+pkgver=1.0.5
 pkgrel=1
-_source_commit=845e885e95af87d1e4bc829e200aee1b6d12e3c5
+_source_commit=5cb2ed32a11a6cd2f75c93aa871c3af7b8b45ae1
 pkgdesc='Shared OBLinux R5 visual identity assets'
 arch=('any')
 url='https://github.com/marcoobaid/oblinux-brand-master'
@@ -9,7 +9,7 @@ license=('MIT' 'custom:OBLinux-brand')
 makedepends=('python' 'python-pillow' 'librsvg')
 optdepends=('inter-font: primary OBLinux typography')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/$_source_commit.tar.gz")
-sha256sums=('4de3ffec0eba77f46f826b323c6208500a1b0ca773fdf683fadb428a6555842d')
+sha256sums=('ae9781df6ac55e8803ce328d2b3eee4396f107885b7d83444988898b6499eda2')
 
 build() {
   cd "oblinux-brand-master-$_source_commit"
