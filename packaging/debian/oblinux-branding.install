@@ -14,3 +14,4 @@ themes/grub/oblinux/* usr/share/grub/themes/oblinux/
 themes/calamares/oblinux/* usr/share/calamares/branding/oblinux/
 brand/master/* usr/share/oblinux/brand/master/
 brand/tokens/* usr/share/oblinux/brand/tokens/
+brand/wallpapers/* usr/share/oblinux/brand/wallpapers/

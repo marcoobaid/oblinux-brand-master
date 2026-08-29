@@ -205,7 +205,7 @@ debian_changelog = require("packaging/debian/changelog").read_text()
 if not debian_changelog.startswith("oblinux-branding (1.0.5-1)"):
     ERRORS.append("Debian package version is not 1.0.5-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
-for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master"):
+for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master", "brand/wallpapers"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
 for line in install.splitlines():
     if line.strip() and not glob.glob(str(ROOT / line.split()[0])):
