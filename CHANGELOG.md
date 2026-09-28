@@ -4,6 +4,33 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-09-27
+
+### Added
+
+- Brought Obsidian Horizon, the shared OBLinux Arch and Debian default
+  wallpaper, under Brand Master ownership. Its editable source composes the
+  approved clean background with the locked white R5 lockup, and
+  `make assets` exports a 3840×2160 production PNG.
+- Documented a 13.1% right / 14% bottom display-safe area for corner-positioned
+  wallpaper branding.
+- Documented the downstream consumption model. ISO repositories import
+  unchanged snapshots of a recorded Brand Master release and advance to newer
+  releases deliberately. The Arch and Debian packaging is separate release
+  metadata.
+
+### Fixed
+
+- Moved the Obsidian Horizon lockup inward, unchanged in size, from about 6%
+  right / 5% bottom to 13.1% / 14%, so it is no longer cropped by GNOME `zoom`
+  on 16:10, 3:2 and 4:3 displays.
+
+### Validation
+
+- Added checks for the pinned background, the unaltered lockup, the safe-area
+  placement, zoom cropping at 16:9, 16:10, 3:2 and 4:3, and the output
+  dimensions. `make check-generated` now also covers `brand/wallpapers/`.
+
 ## [1.0.5] - 2026-08-29
 
 ### Added

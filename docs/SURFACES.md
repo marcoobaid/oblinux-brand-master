@@ -14,7 +14,9 @@
 | Web/docs | lockups, avatar, favicon sources | light/dark variants |
 
 The wallpaper collection contains Default Light, Default Dark, Air, Flow, Orbit,
-and Horizon. Calamares rotates through seven restrained slides, including the
+and Horizon. The 3840×2160 production rasters in `brand/wallpapers/` add Light,
+Dark, Orange, and Obsidian Horizon, the shared default for Arch and Debian
+(see `docs/INTEGRATION.md`). Calamares rotates through seven restrained slides, including the
 completion state, with all logo imagery derived from the corrected masters.
 The Calamares widget sidebar uses the schema-compatible navy background,
 high-contrast white labels, and orange current-step text. Its square logo slot

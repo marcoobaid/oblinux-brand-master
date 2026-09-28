@@ -5,3 +5,6 @@ the final annotated release tag is created only after package metadata is checke
 For a later release, prepare and push its payload commit, update `pkgver` and
 `_source_commit`, calculate the GitHub commit-archive SHA-256, then run
 `makepkg --verifysource`, `makepkg`, and inspect the package with `bsdtar -tf`.
+
+This PKGBUILD is Brand Master packaging and release metadata. It is not how the
+OBLinux ISO repositories consume Brand Master; see `docs/INTEGRATION.md`.

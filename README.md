@@ -14,7 +14,7 @@ make assets          # requires rsvg-convert (librsvg2-bin)
 make check-generated # verifies reproducibility
 ```
 
-The repository is prepared for Brand Master version **1.0.5**. See [the brand guide](brand/BRAND_GUIDE.md),
+The repository is prepared for Brand Master version **1.0.6**. See [the brand guide](brand/BRAND_GUIDE.md),
 [integration documentation](docs/INTEGRATION.md), and [release process](docs/RELEASING.md).
 
 ## Source of truth
@@ -22,6 +22,7 @@ The repository is prepared for Brand Master version **1.0.5**. See [the brand gu
 - Locked identity: `brand/master/oblinux-symbol.svg` and lockups beside it
 - Machine-readable values: `brand/tokens/colors.json`
 - Generated deliverables: `assets/`
+- Shared production wallpapers: `brand/wallpapers/` (SVG sources and 3840×2160 PNGs)
 - Distribution integration: `packaging/debian/` and `packaging/arch/`
 - Surface themes: `themes/`
 - Shared terminal identity: `assets/terminal/fastfetch/`

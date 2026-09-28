@@ -200,10 +200,10 @@ if "'python'" not in arch or "'python-pillow'" not in arch or "'librsvg'" not in
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.5" not in arch: ERRORS.append("Arch package version is not 1.0.5")
+if "pkgver=1.0.6" not in arch: ERRORS.append("Arch package version is not 1.0.6")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.5-1)"):
-    ERRORS.append("Debian package version is not 1.0.5-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.6-1)"):
+    ERRORS.append("Debian package version is not 1.0.6-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master", "brand/wallpapers"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
@@ -212,6 +212,48 @@ for line in install.splitlines():
         ERRORS.append(f"Debian payload pattern matches nothing: {line.split()[0]}")
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand"):
     if payload not in arch: ERRORS.append(f"Arch payload omitted: {payload}")
+
+# Obsidian Horizon: approved clean background + locked white R5 lockup, placed
+# inside the display-safe corner area documented in brand/BRAND_GUIDE.md.
+OBSIDIAN_BACKGROUND_SHA256 = "b8073c48afb64843b1b96114915f29116e3b770e7acd9cb181dbc2f0474d1a5b"
+LOCKUP_INK_RIGHT, LOCKUP_INK_BOTTOM = 1049.3, 281.1  # ink extent in the 1100x320 lockup viewBox
+SAFE_RIGHT, SAFE_BOTTOM = 0.131, 0.14
+obsidian_dir = "brand/wallpapers/source"
+obsidian_background = require(f"{obsidian_dir}/oblinux-obsidian-horizon-clean-3840x2160.jpg")
+if obsidian_background.exists() and hashlib.sha256(obsidian_background.read_bytes()).hexdigest() != OBSIDIAN_BACKGROUND_SHA256:
+    ERRORS.append("approved Obsidian Horizon background changed unexpectedly")
+obsidian_tree = ET.parse(require(f"{obsidian_dir}/oblinux-obsidian-horizon.svg"))
+obsidian_root = obsidian_tree.getroot()
+if obsidian_root.attrib.get("viewBox") != "0 0 3840 2160":
+    ERRORS.append("Obsidian Horizon source is not a 3840x2160 canvas")
+obsidian_images = [element for element in obsidian_tree.iter() if element.tag.rsplit("}", 1)[-1] == "image"]
+if len(obsidian_images) != 1 or obsidian_images[0].attrib.get("{http://www.w3.org/1999/xlink}href") != "oblinux-obsidian-horizon-clean-3840x2160.jpg":
+    ERRORS.append("Obsidian Horizon source does not reference the approved clean background")
+obsidian_lockup = next((element for element in obsidian_tree.iter()
+                        if element.tag.rsplit("}", 1)[-1] == "g" and element.attrib.get("id") == "lockup"), None)
+master_lockup = ET.parse(require("brand/master/oblinux-lockup-white.svg")).getroot()
+signature = lambda root: [(element.tag, sorted(element.attrib.items())) for element in root.iter()][1:]
+if obsidian_lockup is None or signature(obsidian_lockup) != signature(master_lockup):
+    ERRORS.append("Obsidian Horizon does not use the unaltered white R5 lockup master")
+else:
+    placement = re.fullmatch(r"translate\(([\d.]+) ([\d.]+)\) scale\(([\d.]+)\)", obsidian_lockup.attrib.get("transform", ""))
+    if not placement:
+        ERRORS.append("Obsidian Horizon lockup placement is not a uniform translate/scale")
+    else:
+        left, top, scale = (float(value) for value in placement.groups())
+        ink_right, ink_bottom = left + LOCKUP_INK_RIGHT * scale, top + LOCKUP_INK_BOTTOM * scale
+        if (3840 - ink_right) / 3840 < SAFE_RIGHT or (2160 - ink_bottom) / 2160 < SAFE_BOTTOM:
+            ERRORS.append("Obsidian Horizon lockup is outside the 13.1% right / 14% bottom safe area")
+        for ratio_w, ratio_h in ((16, 9), (16, 10), (3, 2), (4, 3)):
+            crop = max(0.0, (3840 - 2160 * ratio_w / ratio_h) / 2)  # GNOME zoom: centered horizontal crop
+            if ink_right > 3840 - crop:
+                ERRORS.append(f"Obsidian Horizon lockup is cropped at {ratio_w}:{ratio_h} with zoom")
+obsidian_png = require("brand/wallpapers/3840x2160/oblinux-obsidian-horizon-3840x2160.png")
+if obsidian_png.exists():
+    data = obsidian_png.read_bytes()
+    if (data[:8] != b"\x89PNG\r\n\x1a\n" or int.from_bytes(data[16:20], "big") != 3840 or
+            int.from_bytes(data[20:24], "big") != 2160 or data[25] != 2):
+        ERRORS.append("Obsidian Horizon production wallpaper is not a 3840x2160 RGB PNG")
 
 fastfetch_logo = require("assets/terminal/fastfetch/logo.txt").read_text(encoding="utf-8")
 fastfetch_config_text = require("assets/terminal/fastfetch/config.jsonc").read_text(encoding="utf-8")

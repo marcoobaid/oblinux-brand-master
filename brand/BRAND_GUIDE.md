@@ -48,3 +48,14 @@ Use white/very light gray for editorial contexts and derived navy/near-black for
 boot/login contexts. Orange is an accent. Wallpapers use R5 curves and negative
 space with a restrained corner signature; never center a giant logo. Write in a
 direct, calm, useful voice. Large console ASCII art is intentionally excluded.
+
+### Wallpaper display-safe area
+
+Corner-positioned branding on a 16:9 wallpaper must keep its visible artwork at
+least **13.1% of the width from the right edge** and **14% of the height from the
+bottom edge**. GNOME `zoom` scales the image to fill the screen and crops the
+overflow equally from both sides: about 5% per side on 16:10, 7.8% on 3:2, and
+12.5% on 4:3, with vertical cropping on displays wider than 16:9. These margins
+keep the complete lockup visible on all of those, with its clear space (one
+quarter of the symbol diameter) intact even at 4:3, without changing the
+scaling mode. `tests/validate.py` enforces them for Obsidian Horizon.

@@ -1,6 +1,26 @@
 # Downstream integration
 
-Consume a tagged Brand Master release. Do not copy-edit assets downstream.
+## Downstream consumption model
+
+Brand Master is authoritative for shared OBLinux branding and publishes
+versioned, tagged releases. The OBLinux ISO development repositories
+(`oblinux-arch-iso-dev`, `oblinux-debian-iso-dev`) consume those releases this
+way:
+
+- Each keeps local copies of the released assets it needs to build its ISO.
+  These copies are release snapshots, imported unchanged from an approved Brand
+  Master release. They are never redesigned or edited downstream.
+- Each records which Brand Master release it currently consumes.
+- Advancing to a newer release is a deliberate downstream change, never
+  automatic, so a new Brand Master release cannot silently alter an existing
+  ISO build. That change reviews the changed assets, copies them in, validates
+  them, and updates the recorded release together.
+- Arch and Debian advance independently, on their own development and release
+  cycles.
+
+`packaging/arch/` and `packaging/debian/` are Brand Master's own packaging and
+release metadata. ISO builds do not install Brand Master through them, and they
+are not how the ISO repositories consume Brand Master.
 
 ## GNOME and GDM
 
@@ -9,6 +29,27 @@ under `/usr/share/gnome-background-properties`, dconf defaults under
 `/etc/dconf/db/local.d`, and hicolor icons under `/usr/share/icons/hicolor`.
 Run `dconf update` and `gtk-update-icon-cache` in the image build. System/About
 uses the `LOGO=oblinux-logo` os-release value.
+
+### Obsidian Horizon
+
+Obsidian Horizon is a shared Brand Master wallpaper, and OBLinux Arch and
+OBLinux Debian both use it as their default. It is distinct from the generated
+"OBLinux Horizon" SVG wallpaper.
+
+- Source of truth: `brand/wallpapers/source/oblinux-obsidian-horizon.svg`. It
+  composes the approved clean background
+  `oblinux-obsidian-horizon-clean-3840x2160.jpg` (original OBLinux artwork,
+  CC BY-SA 4.0, SHA-256 pinned in `tests/validate.py`) with the unaltered
+  `brand/master/oblinux-lockup-white.svg`, inside the display-safe area defined
+  in `brand/BRAND_GUIDE.md`.
+- Production asset: `brand/wallpapers/3840x2160/oblinux-obsidian-horizon-3840x2160.png`,
+  rendered by `make assets` (`scripts/generate-assets.py`). The Brand Master
+  packages install it under `/usr/share/oblinux/brand/wallpapers/3840x2160/`.
+
+ISO repositories import the released PNG unchanged, as described in the
+downstream consumption model above, and display it with GNOME `zoom`. They must
+not keep independently edited or re-exported copies. Composition changes are
+made here and released. Each edition still decides its own dconf default.
 
 GNOME Control Center on Debian also consumes the scalable vendor emblem at
 `/usr/share/icons/vendor/scalable/emblems/emblem-vendor.svg`. Register

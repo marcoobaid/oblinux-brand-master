@@ -230,6 +230,23 @@ def generate(root: Path, with_png: bool = True) -> None:
     render(master / "oblinux-symbol-micro.svg", assets / "web/favicon-32.png", 32)
     write(assets / "terminal/fastfetch/logo.txt",
           terminal_logo(assets / "icons/hicolor/512x512/apps/oblinux-logo.png"))
+    wallpapers = root / "brand/wallpapers"
+    render_opaque(wallpapers / "source/oblinux-obsidian-horizon.svg",
+                  wallpapers / "3840x2160/oblinux-obsidian-horizon-3840x2160.png")
+
+
+def render_opaque(svg: Path, png: Path) -> None:
+    """Render a full-bleed wallpaper at its native size as an opaque RGB PNG."""
+    render(svg, png)
+    try:
+        from PIL import Image  # type: ignore
+    except ImportError as exc:
+        raise RuntimeError("wallpaper export requires Python Pillow") from exc
+    with Image.open(png) as image:
+        if image.mode == "RGB":
+            return
+        opaque = image.convert("RGB")
+    opaque.save(png)
 
 
 def digest_tree(root: Path) -> dict[str, str]:
@@ -266,7 +283,7 @@ def main() -> int:
             shutil.copytree(ROOT, repeated, ignore=ignored)
             generate(staged, not args.source_only)
             generate(repeated, not args.source_only)
-            for relative in ("brand/master", "assets", "themes"):
+            for relative in ("brand/master", "brand/wallpapers", "assets", "themes"):
                 if digest_tree(staged / relative) != digest_tree(repeated / relative):
                     print(f"repeated generation differs in {relative}", file=sys.stderr)
                     return 1

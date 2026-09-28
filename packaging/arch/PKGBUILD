@@ -1,5 +1,5 @@
 pkgname=oblinux-branding
-pkgver=1.0.5
+pkgver=1.0.6
 pkgrel=1
 _source_commit=5cb2ed32a11a6cd2f75c93aa871c3af7b8b45ae1
 pkgdesc='Shared OBLinux R5 visual identity assets'
