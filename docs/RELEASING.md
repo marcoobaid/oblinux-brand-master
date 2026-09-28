@@ -2,7 +2,9 @@
 
 1. Update `CHANGELOG.md` and the package versions.
 2. Run `make assets`, `make validate`, and `make check-generated` in the supported
-   Linux build environment.
+   Linux build environment. Run `make wallpapers` only when a production
+   wallpaper is intentionally changed, and update its pinned SHA-256 in
+   `tests/validate.py` in the same change.
 3. Inspect the complete diff and scan for credentials and absolute paths.
 4. Commit, push normally, and wait for CI.
 5. Pin the Arch source to the immutable release-payload commit and its verified

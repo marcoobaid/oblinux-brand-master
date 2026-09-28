@@ -200,10 +200,10 @@ if "'python'" not in arch or "'python-pillow'" not in arch or "'librsvg'" not in
 if re.search(r"sha256sums=\(['\"]SKIP", arch): ERRORS.append("Arch source checksum is disabled")
 if not re.search(r"_source_commit=[0-9a-f]{40}\b", arch): ERRORS.append("Arch source is not pinned to an immutable commit")
 if not re.search(r"sha256sums=\('[0-9a-f]{64}'\)", arch): ERRORS.append("Arch source checksum is not a SHA-256")
-if "pkgver=1.0.6" not in arch: ERRORS.append("Arch package version is not 1.0.6")
+if "pkgver=1.0.7" not in arch: ERRORS.append("Arch package version is not 1.0.7")
 debian_changelog = require("packaging/debian/changelog").read_text()
-if not debian_changelog.startswith("oblinux-branding (1.0.6-1)"):
-    ERRORS.append("Debian package version is not 1.0.6-1")
+if not debian_changelog.startswith("oblinux-branding (1.0.7-1)"):
+    ERRORS.append("Debian package version is not 1.0.7-1")
 install = require("packaging/debian/oblinux-branding.install").read_text()
 for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "assets/terminal/fastfetch/logo.txt", "assets/terminal/fastfetch/config.jsonc", "themes/plymouth", "themes/grub", "themes/calamares", "brand/master", "brand/wallpapers"):
     if payload not in install: ERRORS.append(f"Debian payload omitted: {payload}")
@@ -216,6 +216,9 @@ for payload in ("assets/wallpapers", "assets/icons/hicolor", "assets/vendor", "a
 # Obsidian Horizon: approved clean background + locked white R5 lockup, placed
 # inside the display-safe corner area documented in brand/BRAND_GUIDE.md.
 OBSIDIAN_BACKGROUND_SHA256 = "b8073c48afb64843b1b96114915f29116e3b770e7acd9cb181dbc2f0474d1a5b"
+# Released production PNG. Package builds run this file after building
+# (Debian dh_auto_test, Arch check()), so an overwritten render fails them.
+OBSIDIAN_PRODUCTION_SHA256 = "6c900f046e2bd2fdc1442d12c28f432aacbbf367d5bae10daa72f1b3a9bdcc56"
 LOCKUP_INK_RIGHT, LOCKUP_INK_BOTTOM = 1049.3, 281.1  # ink extent in the 1100x320 lockup viewBox
 SAFE_RIGHT, SAFE_BOTTOM = 0.131, 0.14
 obsidian_dir = "brand/wallpapers/source"
@@ -254,6 +257,12 @@ if obsidian_png.exists():
     if (data[:8] != b"\x89PNG\r\n\x1a\n" or int.from_bytes(data[16:20], "big") != 3840 or
             int.from_bytes(data[20:24], "big") != 2160 or data[25] != 2):
         ERRORS.append("Obsidian Horizon production wallpaper is not a 3840x2160 RGB PNG")
+    if hashlib.sha256(data).hexdigest() != OBSIDIAN_PRODUCTION_SHA256:
+        ERRORS.append("released Obsidian Horizon production PNG changed (regenerated or overwritten)")
+rules = require("packaging/debian/rules").read_text()
+for name, text in (("Debian rules", rules), ("Arch PKGBUILD", arch)):
+    if "--wallpapers" in text or "make wallpapers" in text:
+        ERRORS.append(f"{name} must not re-export released production wallpapers")
 
 fastfetch_logo = require("assets/terminal/fastfetch/logo.txt").read_text(encoding="utf-8")
 fastfetch_config_text = require("assets/terminal/fastfetch/config.jsonc").read_text(encoding="utf-8")

@@ -43,8 +43,11 @@ OBLinux Debian both use it as their default. It is distinct from the generated
   `brand/master/oblinux-lockup-white.svg`, inside the display-safe area defined
   in `brand/BRAND_GUIDE.md`.
 - Production asset: `brand/wallpapers/3840x2160/oblinux-obsidian-horizon-3840x2160.png`,
-  rendered by `make assets` (`scripts/generate-assets.py`). The Brand Master
-  packages install it under `/usr/share/oblinux/brand/wallpapers/3840x2160/`.
+  a committed release file (SHA-256 pinned in `tests/validate.py`). It is
+  re-exported from the source only deliberately, with `make wallpapers`. The
+  Brand Master packages install the committed file unchanged under
+  `/usr/share/oblinux/brand/wallpapers/3840x2160/`; package builds never
+  re-render it.
 
 ISO repositories import the released PNG unchanged, as described in the
 downstream consumption model above, and display it with GNOME `zoom`. They must

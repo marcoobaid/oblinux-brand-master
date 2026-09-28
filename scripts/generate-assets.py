@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Generate all distributable artwork from the locked SVG masters."""
+"""Generate distributable artwork from the locked SVG masters.
+
+Released production wallpapers under brand/wallpapers/3840x2160/ are committed
+release artifacts. Default generation (``make assets`` and both package builds)
+never writes them; they are exported only on request with ``--wallpapers``
+(``make wallpapers``) when a wallpaper is intentionally changed.
+"""
 
 from __future__ import annotations
 
@@ -15,6 +21,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SIZES = (16, 24, 32, 48, 64, 96, 128, 256, 512, 1024)
+# (editable source, released production raster) under brand/wallpapers/.
+PRODUCTION_WALLPAPERS = (
+    ("source/oblinux-obsidian-horizon.svg", "3840x2160/oblinux-obsidian-horizon-3840x2160.png"),
+)
 
 
 def write(path: Path, data: str) -> None:
@@ -230,9 +240,18 @@ def generate(root: Path, with_png: bool = True) -> None:
     render(master / "oblinux-symbol-micro.svg", assets / "web/favicon-32.png", 32)
     write(assets / "terminal/fastfetch/logo.txt",
           terminal_logo(assets / "icons/hicolor/512x512/apps/oblinux-logo.png"))
+
+
+def export_production_wallpapers(root: Path) -> None:
+    """Deliberately re-export released production wallpapers from their sources.
+
+    The output bytes depend on the local librsvg, Pillow, and zlib, so this is a
+    Brand Master authoring step only. Commit the result and update its pinned
+    SHA-256 in tests/validate.py in the same change.
+    """
     wallpapers = root / "brand/wallpapers"
-    render_opaque(wallpapers / "source/oblinux-obsidian-horizon.svg",
-                  wallpapers / "3840x2160/oblinux-obsidian-horizon-3840x2160.png")
+    for source, production in PRODUCTION_WALLPAPERS:
+        render_opaque(wallpapers / source, wallpapers / production)
 
 
 def render_opaque(svg: Path, png: Path) -> None:
@@ -266,6 +285,8 @@ def main() -> int:
     parser.add_argument("--check", action="store_true")
     parser.add_argument("--clean", action="store_true")
     parser.add_argument("--source-only", action="store_true")
+    parser.add_argument("--wallpapers", action="store_true",
+                        help="re-export released production wallpapers (authoring only)")
     args = parser.parse_args()
     generated = [ROOT / "assets/wallpapers", ROOT / "assets/web", ROOT / "assets/iso",
                  ROOT / "assets/icons/hicolor", ROOT / "assets/vendor",
@@ -281,8 +302,22 @@ def main() -> int:
             ignored = shutil.ignore_patterns(".git", "__pycache__")
             shutil.copytree(ROOT, staged, ignore=ignored)
             shutil.copytree(ROOT, repeated, ignore=ignored)
+            # Default generation must never write released production
+            # wallpapers; a sentinel detects any write, even an identical one.
+            sentinel = b"released production wallpaper: must not be written\n"
+            for _, production in PRODUCTION_WALLPAPERS:
+                (staged / "brand/wallpapers" / production).write_bytes(sentinel)
             generate(staged, not args.source_only)
             generate(repeated, not args.source_only)
+            for _, production in PRODUCTION_WALLPAPERS:
+                relative = f"brand/wallpapers/{production}"
+                if (staged / relative).read_bytes() != sentinel:
+                    print(f"default generation wrote released {relative}", file=sys.stderr)
+                    return 1
+                shutil.copyfile(ROOT / relative, staged / relative)
+            if not args.source_only:
+                export_production_wallpapers(staged)
+                export_production_wallpapers(repeated)
             for relative in ("brand/master", "brand/wallpapers", "assets", "themes"):
                 if digest_tree(staged / relative) != digest_tree(repeated / relative):
                     print(f"repeated generation differs in {relative}", file=sys.stderr)
@@ -290,6 +325,9 @@ def main() -> int:
                 if digest_sources(staged / relative) != digest_sources(ROOT / relative):
                     print(f"committed generated sources differ in {relative}", file=sys.stderr)
                     return 1
+        return 0
+    if args.wallpapers:
+        export_production_wallpapers(ROOT)
         return 0
     generate(ROOT, not args.source_only)
     return 0

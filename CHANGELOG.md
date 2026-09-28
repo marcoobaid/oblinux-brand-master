@@ -4,6 +4,32 @@ All notable changes follow Keep a Changelog and versions follow Semantic Version
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-09-28
+
+### Fixed
+
+- Package builds no longer re-render the released Obsidian Horizon production
+  PNG. `make assets`, and therefore the Debian and Arch package builds, now
+  leave `brand/wallpapers/3840x2160/oblinux-obsidian-horizon-3840x2160.png`
+  untouched and install the committed release file unchanged. Previously the
+  build overwrote it with a render whose bytes depend on the build host's
+  librsvg, Pillow, and zlib (on Debian 13 it differed from the released file).
+  The artwork, placement, dimensions, and released bytes are unchanged.
+
+### Changed
+
+- Re-exporting production wallpapers from their SVG sources is now a deliberate
+  authoring step, `make wallpapers`.
+
+### Validation
+
+- Pinned the released Obsidian Horizon production PNG's SHA-256 in
+  `tests/validate.py`, which both package builds run after building, so an
+  overwritten render fails the build.
+- `make check-generated` now fails if default generation writes a released
+  production wallpaper at all, and still checks that explicit re-export is
+  reproducible.
+
 ## [1.0.6] - 2026-09-27
 
 ### Added

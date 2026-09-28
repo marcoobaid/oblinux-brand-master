@@ -44,6 +44,11 @@ Keep these categories distinct — do not blur or merge them:
   `assets/wallpapers/`, `assets/icons/hicolor/`, `assets/web/`,
   `assets/vendor/`) via `scripts/generate-assets.py`. These may be
   regenerated from the masters; they should never be hand-edited directly.
+- **Released production wallpapers** — the committed rasters in
+  `brand/wallpapers/3840x2160/` exported from `brand/wallpapers/source/`.
+  They are release artifacts: package builds and `make assets` must never
+  regenerate them. Re-export only deliberately with `make wallpapers`, and
+  update the pinned SHA-256 in `tests/validate.py` in the same change.
 - **Reference** — owner-approved visual reference material retained for
   verification only (`brand/reference/`). Not a generated deliverable and not
   a package payload.
